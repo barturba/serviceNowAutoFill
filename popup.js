@@ -238,14 +238,16 @@ async function fillTimeInNestedFrame(timeValue) {
         console.warn('⚠ work_notes field not found, skipping');
       }
       if (workTypeField) {
-        // For select dropdown, try to set to a common value like "Planned" or first available option
+        // For select dropdown, try to set to "Technical Troubleshooting & Diagnosis"
         if (workTypeField.tagName === 'SELECT') {
-          // Try to find and select "Planned" or "Work" option
           const options = Array.from(workTypeField.options);
           console.log('Available work_type options:', options.map(o => ({ value: o.value, text: o.text })));
 
-          // Try to select "Planned" or "Work" or first non-empty option
-          let selectedOption = options.find(o => o.text.toLowerCase().includes('planned')) ||
+          // Try to select "Technical Troubleshooting & Diagnosis" first, then fall back to other options
+          let selectedOption = options.find(o => o.text.toLowerCase().includes('technical troubleshooting')) ||
+                              options.find(o => o.text.toLowerCase().includes('troubleshooting')) ||
+                              options.find(o => o.text.toLowerCase().includes('diagnosis')) ||
+                              options.find(o => o.text.toLowerCase().includes('planned')) ||
                               options.find(o => o.text.toLowerCase().includes('work')) ||
                               options.find(o => o.value && o.value !== '');
 
@@ -256,9 +258,9 @@ async function fillTimeInNestedFrame(timeValue) {
             console.warn('⚠ No suitable work_type option found');
           }
         } else {
-          // If it's an input field, set it to "Planned"
-          workTypeField.value = 'Planned';
-          console.log('Set work_type to: Planned');
+          // If it's an input field, set it to "Technical Troubleshooting & Diagnosis"
+          workTypeField.value = 'Technical Troubleshooting & Diagnosis';
+          console.log('Set work_type to: Technical Troubleshooting & Diagnosis');
         }
         fieldsToUpdate.push(workTypeField);
       } else {
