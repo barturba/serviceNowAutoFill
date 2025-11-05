@@ -127,14 +127,15 @@ async function fillTimeInNestedFrame(timeValue) {
       console.log('All work_type elements:', Array.from(allWorkTypeElements).map(e => ({ id: e.id, tag: e.tagName, type: e.type })));
 
       // Try multiple selectors in order of specificity for start field (works for incident, sc_task, etc.)
-      let startField = doc.querySelector('input[id$=".u_work_start"]') ||
-                      doc.querySelector('input[id$="u_work_start"]') ||
-                      doc.querySelector('input[name$=".u_work_start"]') ||
-                      doc.querySelector('input[id*="work_start"]');
+      // Exclude hidden fields by checking they're not type="hidden"
+      let startField = doc.querySelector('input[id$=".u_work_start"]:not([type="hidden"])') ||
+                      doc.querySelector('input[id$="u_work_start"]:not([type="hidden"])') ||
+                      doc.querySelector('input[name$=".u_work_start"]:not([type="hidden"])') ||
+                      doc.querySelector('input[id*="work_start"]:not([type="hidden"])');
       if (!startField) {
         console.log('Waiting for work_start field...');
         try {
-          startField = await waitForElement(doc, 'input[id$=".u_work_start"], input[id$="u_work_start"], input[id*="work_start"]');
+          startField = await waitForElement(doc, 'input[id$=".u_work_start"]:not([type="hidden"]), input[id$="u_work_start"]:not([type="hidden"]), input[id*="work_start"]:not([type="hidden"])');
         } catch (e) {
           console.log('Could not find work_start input field:', e.message);
         }
@@ -142,14 +143,15 @@ async function fillTimeInNestedFrame(timeValue) {
       console.log('Found work_start:', startField?.id, 'tag:', startField?.tagName, 'type:', startField?.type);
 
       // Try multiple selectors for end field (works for incident, sc_task, etc.)
-      let endField = doc.querySelector('input[id$=".u_work_end"]') ||
-                    doc.querySelector('input[id$="u_work_end"]') ||
-                    doc.querySelector('input[name$=".u_work_end"]') ||
-                    doc.querySelector('input[id*="work_end"]');
+      // Exclude hidden fields by checking they're not type="hidden"
+      let endField = doc.querySelector('input[id$=".u_work_end"]:not([type="hidden"])') ||
+                    doc.querySelector('input[id$="u_work_end"]:not([type="hidden"])') ||
+                    doc.querySelector('input[name$=".u_work_end"]:not([type="hidden"])') ||
+                    doc.querySelector('input[id*="work_end"]:not([type="hidden"])');
       if (!endField) {
         console.log('Waiting for work_end field...');
         try {
-          endField = await waitForElement(doc, 'input[id$=".u_work_end"], input[id$="u_work_end"], input[id*="work_end"]');
+          endField = await waitForElement(doc, 'input[id$=".u_work_end"]:not([type="hidden"]), input[id$="u_work_end"]:not([type="hidden"]), input[id*="work_end"]:not([type="hidden"])');
         } catch (e) {
           console.log('Could not find work_end input field:', e.message);
         }
