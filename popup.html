@@ -3,13 +3,53 @@
 <head>
   <title>Time Entry</title>
   <style>
-    body { font-family: Arial; padding: 10px; width: 200px; }
-    button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; cursor: pointer; }
-    button:hover { background: #0056b3; }
+    body {
+      font-family: Arial;
+      padding: 10px;
+      width: 200px;
+      margin: 0;
+    }
+    h3 {
+      margin: 0 0 10px 0;
+      font-size: 14px;
+      color: #333;
+      text-align: center;
+    }
+    .button-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    button {
+      padding: 12px 8px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    button:active {
+      background: #004085;
+      transform: scale(0.98);
+    }
   </style>
 </head>
 <body>
-  <button id="fillBtn">15 min</button>
+  <h3>Fill Time Entry</h3>
+  <div class="button-grid">
+    <button class="time-btn" data-time="15 minutes">15 min</button>
+    <button class="time-btn" data-time="30 minutes">30 min</button>
+    <button class="time-btn" data-time="45 minutes">45 min</button>
+    <button class="time-btn" data-time="1 hour">1 hour</button>
+    <button class="time-btn" data-time="1 hour 30 minutes">1.5 hours</button>
+    <button class="time-btn" data-time="2 hours">2 hours</button>
+  </div>
   <script src="popup.js"></script>
 </body>
 </html>

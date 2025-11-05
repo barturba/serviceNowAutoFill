@@ -1,24 +1,33 @@
-document.getElementById('fillBtn').addEventListener('click', () => {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    const tabId = tabs[0].id;
+// Get all time buttons and add click listeners
+document.querySelectorAll('.time-btn').forEach(button => {
+  button.addEventListener('click', () => {
+    const timeValue = button.getAttribute('data-time');
 
-    // Inject script into the main tab (not specific frame)
-    chrome.scripting.executeScript({
-      target: { tabId },
-      func: fillTimeInNestedFrame,
-      args: ['15 minutes']
-    }, (results) => {
-      if (chrome.runtime.lastError) {
-        console.error(chrome.runtime.lastError);
-        alert('Error: ' + chrome.runtime.lastError.message);
-      } else if (results && results[0].result) {
-        const result = results[0].result;
-        if (result.success) {
-          alert('Time filled successfully!');
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const tabId = tabs[0].id;
+
+      // Inject script into the main tab (not specific frame)
+      chrome.scripting.executeScript({
+        target: { tabId },
+        func: fillTimeInNestedFrame,
+        args: [timeValue]
+      }, (results) => {
+        if (chrome.runtime.lastError) {
+          console.error(chrome.runtime.lastError);
+          alert('Error: ' + chrome.runtime.lastError.message);
+        } else if (results && results[0].result) {
+          const result = results[0].result;
+          if (result.success) {
+            // Close popup on success
+            window.close();
+          } else {
+            alert('Failed: ' + (result.error || 'Unknown error'));
+          }
         } else {
-          alert('Failed: ' + (result.error || 'Unknown error'));
+          // Close popup if no results (script injected successfully)
+          window.close();
         }
-      }
+      });
     });
   });
 });
