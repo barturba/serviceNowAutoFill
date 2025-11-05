@@ -278,7 +278,7 @@ function fillTimeInNestedFrame(timeValue) {
 
                 startField.value = formattedStart;
                 endField.value = formattedEnd;
-                workNotesField.value = 'time';
+                workNotesField.value = 'updating time';
 
                 console.log('Set work_start to:', formattedStart);
                 console.log('Set work_end to:', formattedEnd);
