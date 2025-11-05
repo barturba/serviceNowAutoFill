@@ -173,6 +173,13 @@ async function fillTimeInNestedFrame(timeValue) {
       }
       console.log('Found work_notes:', workNotesField?.id, 'tag:', workNotesField?.tagName);
 
+      // Also look for contenteditable rich text editor for work_notes
+      let workNotesEditable = doc.querySelector('[id*="work_notes"][contenteditable="true"]') ||
+                              doc.querySelector('[contenteditable="true"][id*="work_notes"]');
+      if (workNotesEditable) {
+        console.log('Found work_notes contenteditable element:', workNotesEditable.id || workNotesEditable.className);
+      }
+
       // Work type - try to find select dropdown or input
       let workTypeField = doc.querySelector('select[id="incident.u_work_type"]') ||
                          doc.querySelector('select[name="incident.u_work_type"]') ||
