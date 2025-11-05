@@ -237,6 +237,25 @@ async function fillTimeInNestedFrame(timeValue) {
       } else {
         console.warn('⚠ work_end field not found, skipping');
       }
+      // Try ServiceNow's GlideForm API first
+      const workNotesText = 'updating time';
+      let workNotesSetViaAPI = false;
+
+      // Check if g_form (ServiceNow's form API) is available
+      if (typeof doc.defaultView.g_form !== 'undefined' && doc.defaultView.g_form) {
+        console.log('Found ServiceNow g_form API, using it to set work_notes');
+        try {
+          // Try to set using GlideForm API
+          doc.defaultView.g_form.setValue('work_notes', workNotesText);
+          console.log('✓ Set work_notes using g_form.setValue()');
+          workNotesSetViaAPI = true;
+        } catch (e) {
+          console.log('g_form.setValue failed:', e.message);
+        }
+      } else {
+        console.log('g_form API not available, will use direct field manipulation');
+      }
+
       if (workNotesField) {
         console.log('Attempting to populate work_notes field...');
 
@@ -244,21 +263,24 @@ async function fillTimeInNestedFrame(timeValue) {
         workNotesField.click();
         workNotesField.focus();
 
+        // Wait a moment for field to become active
+        await new Promise(resolve => setTimeout(resolve, 100));
+
         // Clear existing content
         workNotesField.value = '';
 
         // Method 2: Use document.execCommand (simulates typing)
         try {
           workNotesField.select();
-          document.execCommand('insertText', false, 'updating time');
+          document.execCommand('insertText', false, workNotesText);
           console.log('Used execCommand to insert text');
         } catch (e) {
           console.log('execCommand failed, using direct value setting:', e.message);
         }
 
         // Method 3: Direct value setting as fallback
-        workNotesField.value = 'updating time';
-        console.log('Set work_notes textarea value to: updating time');
+        workNotesField.value = workNotesText;
+        console.log('Set work_notes textarea value to:', workNotesText);
 
         // Trigger comprehensive events
         const events = ['click', 'focus', 'keydown', 'keypress', 'input', 'keyup', 'change', 'blur'];
@@ -272,7 +294,7 @@ async function fillTimeInNestedFrame(timeValue) {
           bubbles: true,
           cancelable: true,
           inputType: 'insertText',
-          data: 'updating time'
+          data: workNotesText
         });
         workNotesField.dispatchEvent(inputEvent);
 
@@ -285,8 +307,8 @@ async function fillTimeInNestedFrame(timeValue) {
       if (workNotesEditable) {
         console.log('Updating contenteditable work_notes element...');
         workNotesEditable.focus();
-        workNotesEditable.textContent = 'updating time';
-        workNotesEditable.innerHTML = 'updating time';
+        workNotesEditable.textContent = workNotesText;
+        workNotesEditable.innerHTML = workNotesText;
 
         // Trigger events on the contenteditable element
         workNotesEditable.dispatchEvent(new Event('focus', { bubbles: true }));
@@ -295,7 +317,7 @@ async function fillTimeInNestedFrame(timeValue) {
         workNotesEditable.dispatchEvent(new Event('keyup', { bubbles: true }));
         workNotesEditable.dispatchEvent(new Event('change', { bubbles: true }));
         workNotesEditable.dispatchEvent(new Event('blur', { bubbles: true }));
-        console.log('Set work_notes contenteditable to: updating time');
+        console.log('Set work_notes contenteditable to:', workNotesText);
       } else {
         // If no direct contenteditable found, check parent wrapper
         if (workNotesField) {
@@ -306,8 +328,8 @@ async function fillTimeInNestedFrame(timeValue) {
             if (editableContent) {
               console.log('Found contenteditable element in wrapper, updating it too');
               editableContent.focus();
-              editableContent.textContent = 'updating time';
-              editableContent.innerHTML = 'updating time';
+              editableContent.textContent = workNotesText;
+              editableContent.innerHTML = workNotesText;
               editableContent.dispatchEvent(new Event('focus', { bubbles: true }));
               editableContent.dispatchEvent(new Event('input', { bubbles: true }));
               editableContent.dispatchEvent(new Event('change', { bubbles: true }));
