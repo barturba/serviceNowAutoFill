@@ -238,20 +238,43 @@ async function fillTimeInNestedFrame(timeValue) {
         console.warn('⚠ work_end field not found, skipping');
       }
       if (workNotesField) {
-        // Focus the field first to trigger any UI components
+        console.log('Attempting to populate work_notes field...');
+
+        // Method 1: Click to activate the field
+        workNotesField.click();
         workNotesField.focus();
 
-        // Set the value
-        workNotesField.value = 'updating time';
-        console.log('Set work_notes textarea to: updating time');
+        // Clear existing content
+        workNotesField.value = '';
 
-        // Trigger additional events for rich text editors
-        workNotesField.dispatchEvent(new Event('focus', { bubbles: true }));
-        workNotesField.dispatchEvent(new Event('input', { bubbles: true }));
-        workNotesField.dispatchEvent(new Event('keydown', { bubbles: true }));
-        workNotesField.dispatchEvent(new Event('keyup', { bubbles: true }));
-        workNotesField.dispatchEvent(new Event('change', { bubbles: true }));
-        workNotesField.dispatchEvent(new Event('blur', { bubbles: true }));
+        // Method 2: Use document.execCommand (simulates typing)
+        try {
+          workNotesField.select();
+          document.execCommand('insertText', false, 'updating time');
+          console.log('Used execCommand to insert text');
+        } catch (e) {
+          console.log('execCommand failed, using direct value setting:', e.message);
+        }
+
+        // Method 3: Direct value setting as fallback
+        workNotesField.value = 'updating time';
+        console.log('Set work_notes textarea value to: updating time');
+
+        // Trigger comprehensive events
+        const events = ['click', 'focus', 'keydown', 'keypress', 'input', 'keyup', 'change', 'blur'];
+        events.forEach(eventType => {
+          const event = new Event(eventType, { bubbles: true, cancelable: true });
+          workNotesField.dispatchEvent(event);
+        });
+
+        // Also trigger InputEvent specifically
+        const inputEvent = new InputEvent('input', {
+          bubbles: true,
+          cancelable: true,
+          inputType: 'insertText',
+          data: 'updating time'
+        });
+        workNotesField.dispatchEvent(inputEvent);
 
         fieldsToUpdate.push(workNotesField);
       } else {
