@@ -1,13 +1,11 @@
 {
     "manifest_version": 3,
-    "name": "ServiceNow Time Entry",
+    "name": "Simple ServiceNow Time Entry",
     "version": "1.0",
-    "description": "Allows manual selection of time to enter for ServiceNow tickets.",
+    "description": "Fills 15 minutes time worked with a single button.",
     "permissions": [
       "activeTab",
-      "scripting",
-      "storage",
-      "tabs"
+      "scripting"
     ],
     "host_permissions": [
       "*://*.service-now.com/*"
