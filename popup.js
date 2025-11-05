@@ -126,51 +126,51 @@ async function fillTimeInNestedFrame(timeValue) {
       console.log('All work_notes elements:', Array.from(allWorkNotesElements).map(e => ({ id: e.id, tag: e.tagName, type: e.type })));
       console.log('All work_type elements:', Array.from(allWorkTypeElements).map(e => ({ id: e.id, tag: e.tagName, type: e.type })));
 
-      // Try multiple selectors in order of specificity for start field
-      let startField = doc.querySelector('input[id="incident.u_work_start"]') ||
-                      doc.querySelector('input[name="incident.u_work_start"]') ||
+      // Try multiple selectors in order of specificity for start field (works for incident, sc_task, etc.)
+      let startField = doc.querySelector('input[id$=".u_work_start"]') ||
                       doc.querySelector('input[id$="u_work_start"]') ||
+                      doc.querySelector('input[name$=".u_work_start"]') ||
                       doc.querySelector('input[id*="work_start"]');
       if (!startField) {
         console.log('Waiting for work_start field...');
         try {
-          startField = await waitForElement(doc, 'input[id="incident.u_work_start"], input[id$="u_work_start"], input[id*="work_start"]');
+          startField = await waitForElement(doc, 'input[id$=".u_work_start"], input[id$="u_work_start"], input[id*="work_start"]');
         } catch (e) {
           console.log('Could not find work_start input field:', e.message);
         }
       }
       console.log('Found work_start:', startField?.id, 'tag:', startField?.tagName, 'type:', startField?.type);
 
-      // Try multiple selectors for end field
-      let endField = doc.querySelector('input[id="incident.u_work_end"]') ||
-                    doc.querySelector('input[name="incident.u_work_end"]') ||
+      // Try multiple selectors for end field (works for incident, sc_task, etc.)
+      let endField = doc.querySelector('input[id$=".u_work_end"]') ||
                     doc.querySelector('input[id$="u_work_end"]') ||
+                    doc.querySelector('input[name$=".u_work_end"]') ||
                     doc.querySelector('input[id*="work_end"]');
       if (!endField) {
         console.log('Waiting for work_end field...');
         try {
-          endField = await waitForElement(doc, 'input[id="incident.u_work_end"], input[id$="u_work_end"], input[id*="work_end"]');
+          endField = await waitForElement(doc, 'input[id$=".u_work_end"], input[id$="u_work_end"], input[id*="work_end"]');
         } catch (e) {
           console.log('Could not find work_end input field:', e.message);
         }
       }
       console.log('Found work_end:', endField?.id, 'tag:', endField?.tagName, 'type:', endField?.type);
 
-      // Work notes - try to find the Angular activity stream textarea FIRST (visible field)
+      // Work notes - try to find the Angular activity stream textarea FIRST (works for all tables)
       let workNotesField = doc.querySelector('textarea#activity-stream-textarea') ||
                           doc.querySelector('textarea[data-stream-text-input="work_notes"]') ||
                           doc.querySelector('textarea[ng-model*="inputTypeValue"]') ||
                           doc.querySelector('textarea[id*="activity-stream"][id*="work_notes"]') ||
-                          doc.querySelector('textarea[id="incident.work_notes"]') ||
+                          doc.querySelector('textarea[id$=".work_notes"]') ||
                           doc.querySelector('textarea[id$="work_notes"]') ||
-                          doc.querySelector('textarea[name="incident.work_notes"]') ||
-                          doc.querySelector('input[id="incident.work_notes"]') ||
+                          doc.querySelector('textarea[name$=".work_notes"]') ||
+                          doc.querySelector('input[id$=".work_notes"]') ||
                           doc.querySelector('textarea[id*="work_notes"]') ||
                           doc.querySelector('input[id*="work_notes"]');
       if (!workNotesField) {
         console.log('Waiting for work_notes field...');
         try {
-          workNotesField = await waitForElement(doc, 'textarea#activity-stream-textarea, textarea[data-stream-text-input="work_notes"], textarea[id*="work_notes"], input[id*="work_notes"]');
+          workNotesField = await waitForElement(doc, 'textarea#activity-stream-textarea, textarea[data-stream-text-input="work_notes"], textarea[id$=".work_notes"], textarea[id*="work_notes"], input[id*="work_notes"]');
         } catch (e) {
           console.log('Could not find work_notes field:', e.message);
         }
@@ -184,18 +184,18 @@ async function fillTimeInNestedFrame(timeValue) {
         console.log('Found work_notes contenteditable element:', workNotesEditable.id || workNotesEditable.className);
       }
 
-      // Work type - try to find select dropdown or input
-      let workTypeField = doc.querySelector('select[id="incident.u_work_type"]') ||
-                         doc.querySelector('select[name="incident.u_work_type"]') ||
+      // Work type - try to find select dropdown or input (works for all tables)
+      let workTypeField = doc.querySelector('select[id$=".u_work_type"]') ||
                          doc.querySelector('select[id$="u_work_type"]') ||
+                         doc.querySelector('select[name$=".u_work_type"]') ||
                          doc.querySelector('select[id*="work_type"]') ||
-                         doc.querySelector('input[id="incident.u_work_type"]') ||
+                         doc.querySelector('input[id$=".u_work_type"]') ||
                          doc.querySelector('input[id$="u_work_type"]') ||
                          doc.querySelector('input[id*="work_type"]');
       if (!workTypeField) {
         console.log('Waiting for work_type field...');
         try {
-          workTypeField = await waitForElement(doc, 'select[id*="work_type"], input[id*="work_type"]');
+          workTypeField = await waitForElement(doc, 'select[id$=".u_work_type"], select[id$="u_work_type"], select[id*="work_type"], input[id*="work_type"]');
         } catch (e) {
           console.log('Could not find work_type field:', e.message);
         }
