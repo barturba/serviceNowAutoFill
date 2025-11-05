@@ -353,7 +353,18 @@ async function fillTimeInNestedFrame(timeValue) {
                               options.find(o => o.value && o.value !== '');
 
           if (selectedOption) {
-            workTypeField.value = selectedOption.value;
+            // Try using g_form API first
+            if (typeof doc.defaultView.g_form !== 'undefined' && doc.defaultView.g_form) {
+              try {
+                doc.defaultView.g_form.setValue('u_work_type', selectedOption.value);
+                console.log('✓ Set work_type using g_form.setValue() to:', selectedOption.text);
+              } catch (e) {
+                console.log('g_form.setValue for work_type failed, using direct value:', e.message);
+                workTypeField.value = selectedOption.value;
+              }
+            } else {
+              workTypeField.value = selectedOption.value;
+            }
             console.log('Set work_type to:', selectedOption.text, '(value:', selectedOption.value + ')');
           } else {
             console.warn('⚠ No suitable work_type option found');
