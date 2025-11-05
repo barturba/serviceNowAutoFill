@@ -122,7 +122,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           const hours = d.getHours().toString().padStart(2, '0');
           const mins = d.getMinutes().toString().padStart(2, '0');
           const secs = d.getSeconds().toString().padStart(2, '0');
-          return `${year}-${month}-${day} ${hours}:${mins}:${secs}`;
+          return `${month}/${day}/${year} ${hours}:${mins}:${secs}`;
         }
 
         startField.value = formatDate(startTime);

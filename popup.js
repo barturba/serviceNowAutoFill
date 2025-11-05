@@ -210,14 +210,24 @@ function fillTimeInNestedFrame(timeValue) {
                 if (!hiddenTime) throw new Error('Hidden time field not found');
                 console.log('Found hidden time:', hiddenTime.id);
 
-                // Find work start/end fields
-                const startField = iframeDoc.querySelector('[id*="work_start"]') ||
-                                  await waitForElement(iframeDoc, '[id*="work_start"]');
-                console.log('Found work_start:', startField.id);
+                // Find work start/end input fields (the actual datetime inputs)
+                let startField = iframeDoc.querySelector('input[id="incident.u_work_start"]') ||
+                                iframeDoc.querySelector('input[name="incident.u_work_start"]');
 
-                const endField = iframeDoc.querySelector('[id*="work_end"]') ||
-                                await waitForElement(iframeDoc, '[id*="work_end"]');
-                console.log('Found work_end:', endField.id);
+                if (!startField) {
+                  console.log('Waiting for work_start input field...');
+                  startField = await waitForElement(iframeDoc, 'input[id="incident.u_work_start"]');
+                }
+                console.log('Found work_start input:', startField?.id, 'current value:', startField?.value);
+
+                let endField = iframeDoc.querySelector('input[id="incident.u_work_end"]') ||
+                              iframeDoc.querySelector('input[name="incident.u_work_end"]');
+
+                if (!endField) {
+                  console.log('Waiting for work_end input field...');
+                  endField = await waitForElement(iframeDoc, 'input[id="incident.u_work_end"]');
+                }
+                console.log('Found work_end input:', endField?.id, 'current value:', endField?.value);
 
                 const workNotesField = iframeDoc.querySelector('[id*="work_notes"]') ||
                                       await waitForElement(iframeDoc, '[id*="work_notes"]');
@@ -226,10 +236,10 @@ function fillTimeInNestedFrame(timeValue) {
                 // Find work type dropdown (optional - may not exist in all forms)
                 let workTypeField = null;
                 try {
-                  workTypeField = iframeDoc.querySelector('[id*="work_type"]') ||
-                                 iframeDoc.querySelector('select[id*="work_type"]');
+                  workTypeField = iframeDoc.querySelector('select[id="incident.u_work_type"]') ||
+                                 iframeDoc.querySelector('input[id="incident.u_work_type"]');
                   if (workTypeField) {
-                    console.log('Found work_type:', workTypeField.id);
+                    console.log('Found work_type:', workTypeField.id, 'tag:', workTypeField.tagName);
                   } else {
                     console.log('Work type field not found (may not exist in this form)');
                   }
@@ -259,29 +269,45 @@ function fillTimeInNestedFrame(timeValue) {
                   const hours = d.getHours().toString().padStart(2, '0');
                   const mins = d.getMinutes().toString().padStart(2, '0');
                   const secs = d.getSeconds().toString().padStart(2, '0');
-                  return `${year}-${month}-${day} ${hours}:${mins}:${secs}`;
+                  return `${month}/${day}/${year} ${hours}:${mins}:${secs}`;
                 }
 
-                startField.value = formatDate(startTime);
-                endField.value = formatDate(endTime);
+                // Set work start/end times
+                const formattedStart = formatDate(startTime);
+                const formattedEnd = formatDate(endTime);
+
+                startField.value = formattedStart;
+                endField.value = formattedEnd;
                 workNotesField.value = 'time';
+
+                console.log('Set work_start to:', formattedStart);
+                console.log('Set work_end to:', formattedEnd);
 
                 // Set work type if field exists
                 if (workTypeField) {
                   // Try to find the option with "Technical Troubleshooting" text
                   if (workTypeField.tagName === 'SELECT') {
+                    // First try the exact value
+                    const targetValue = 'technical_troubleshooting_diagnostics';
                     const options = Array.from(workTypeField.options);
-                    const targetOption = options.find(opt =>
-                      opt.text.includes('Technical Troubleshooting') ||
-                      opt.text.includes('Diagnostics')
-                    );
+                    const targetOption = options.find(opt => opt.value === targetValue);
 
                     if (targetOption) {
-                      workTypeField.value = targetOption.value;
-                      console.log('Set work_type to:', targetOption.text);
+                      workTypeField.value = targetValue;
+                      console.log('Set work_type to:', targetOption.text, 'value:', targetValue);
                     } else {
-                      console.log('Could not find "Technical Troubleshooting & Diagnostics" option. Available options:',
-                        options.map(opt => opt.text));
+                      // If exact value not found, search by text
+                      const textOption = options.find(opt =>
+                        opt.text.includes('Technical Troubleshooting') ||
+                        opt.text.includes('Diagnostics')
+                      );
+                      if (textOption) {
+                        workTypeField.value = textOption.value;
+                        console.log('Set work_type to:', textOption.text);
+                      } else {
+                        console.log('Could not find "Technical Troubleshooting & Diagnostics" option. Available options:',
+                          options.map(opt => ({ text: opt.text, value: opt.value })));
+                      }
                     }
                   } else {
                     // If it's an input field (reference field), set the display value
@@ -292,6 +318,7 @@ function fillTimeInNestedFrame(timeValue) {
 
                 // Dispatch events on all fields
                 const fieldsToUpdate = [hourInput, minInput, secInput, hiddenTime, startField, endField, workNotesField];
+
                 if (workTypeField) {
                   fieldsToUpdate.push(workTypeField);
                 }
