@@ -6,7 +6,8 @@
     "permissions": [
       "activeTab",
       "scripting",
-      "storage"
+      "storage",
+      "tabs"
     ],
     "host_permissions": [
       "*://*.service-now.com/*"
@@ -18,7 +19,8 @@
       {
         "matches": ["*://*.service-now.com/*"],
         "js": ["content.js"],
-        "run_at": "document_end"
+        "run_at": "document_end",
+        "all_frames": true
       }
     ]
   }
