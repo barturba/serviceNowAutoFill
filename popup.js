@@ -156,8 +156,12 @@ async function fillTimeInNestedFrame(timeValue) {
       }
       console.log('Found work_end:', endField?.id, 'tag:', endField?.tagName, 'type:', endField?.type);
 
-      // Work notes - try to find textarea or input, not wrapper div
-      let workNotesField = doc.querySelector('textarea[id="incident.work_notes"]') ||
+      // Work notes - try to find the Angular activity stream textarea FIRST (visible field)
+      let workNotesField = doc.querySelector('textarea#activity-stream-textarea') ||
+                          doc.querySelector('textarea[data-stream-text-input="work_notes"]') ||
+                          doc.querySelector('textarea[ng-model*="inputTypeValue"]') ||
+                          doc.querySelector('textarea[id*="activity-stream"][id*="work_notes"]') ||
+                          doc.querySelector('textarea[id="incident.work_notes"]') ||
                           doc.querySelector('textarea[id$="work_notes"]') ||
                           doc.querySelector('textarea[name="incident.work_notes"]') ||
                           doc.querySelector('input[id="incident.work_notes"]') ||
@@ -166,12 +170,12 @@ async function fillTimeInNestedFrame(timeValue) {
       if (!workNotesField) {
         console.log('Waiting for work_notes field...');
         try {
-          workNotesField = await waitForElement(doc, 'textarea[id*="work_notes"], input[id*="work_notes"]');
+          workNotesField = await waitForElement(doc, 'textarea#activity-stream-textarea, textarea[data-stream-text-input="work_notes"], textarea[id*="work_notes"], input[id*="work_notes"]');
         } catch (e) {
           console.log('Could not find work_notes field:', e.message);
         }
       }
-      console.log('Found work_notes:', workNotesField?.id, 'tag:', workNotesField?.tagName);
+      console.log('Found work_notes:', workNotesField?.id, 'tag:', workNotesField?.tagName, 'has ng-model:', workNotesField?.getAttribute('ng-model'));
 
       // Also look for contenteditable rich text editor for work_notes
       let workNotesEditable = doc.querySelector('[id*="work_notes"][contenteditable="true"]') ||
@@ -263,8 +267,9 @@ async function fillTimeInNestedFrame(timeValue) {
 
         // Method 1: Try AngularJS scope manipulation (ServiceNow uses Angular)
         try {
-          // Get the Angular element wrapper
-          const angular = doc.defaultView.angular;
+          // Try to find Angular in multiple contexts
+          let angular = doc.defaultView.angular || window.angular || doc.defaultView.parent?.angular;
+
           if (angular) {
             console.log('Found AngularJS, attempting to set via scope...');
             const ngElement = angular.element(workNotesField);
@@ -289,18 +294,38 @@ async function fillTimeInNestedFrame(timeValue) {
                   target[modelParts[modelParts.length - 1]] = workNotesText;
                   console.log('Set Angular model:', ngModel, '=', workNotesText);
 
-                  // Apply the scope changes
-                  scope.$apply();
-                  console.log('✓ Applied Angular scope changes');
-                  workNotesSetViaAPI = true;
+                  // Apply the scope changes (use $evalAsync if $apply fails)
+                  try {
+                    if (scope.$$phase) {
+                      // Already in digest cycle, use $evalAsync
+                      scope.$evalAsync();
+                      console.log('✓ Used $evalAsync (already in digest)');
+                    } else {
+                      scope.$apply();
+                      console.log('✓ Applied Angular scope changes with $apply');
+                    }
+                    workNotesSetViaAPI = true;
+                  } catch (applyError) {
+                    console.log('$apply/$evalAsync failed, trying direct update:', applyError.message);
+                    // Force a digest
+                    try {
+                      scope.$digest();
+                      console.log('✓ Used $digest instead');
+                      workNotesSetViaAPI = true;
+                    } catch (digestError) {
+                      console.log('$digest also failed:', digestError.message);
+                    }
+                  }
                 }
               }
+            } else {
+              console.log('Could not get Angular scope from element');
             }
           } else {
-            console.log('AngularJS not found in window');
+            console.log('AngularJS not found in iframe window, parent, or main window');
           }
         } catch (e) {
-          console.log('Angular scope manipulation failed:', e.message);
+          console.log('Angular scope manipulation failed:', e.message, e.stack);
         }
 
         // Method 2: Click to activate the field
