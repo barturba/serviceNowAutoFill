@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
     "name": "ServiceNow Time Entry Assistant",
-    "version": "2.0",
-    "description": "Quick time entry for ServiceNow incidents. Fill 15min, 30min, 45min, 1hr, 1.5hr, or 2hr with one click. Works with both classic and modern ServiceNow UIs.",
+    "version": "2.1",
+    "description": "Quick time entry for ServiceNow incidents and catalog tasks. Fill 15min, 30min, 45min, 1hr, 1.5hr, or 2hr with one click. Works with both classic and modern ServiceNow UIs.",
     "permissions": [
       "activeTab",
       "scripting",
