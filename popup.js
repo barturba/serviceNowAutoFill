@@ -231,8 +231,36 @@ async function fillTimeInNestedFrame(timeValue) {
         console.warn('⚠ work_end field not found, skipping');
       }
       if (workNotesField) {
+        // Focus the field first to trigger any UI components
+        workNotesField.focus();
+
+        // Set the value
         workNotesField.value = 'updating time';
         console.log('Set work_notes to: updating time');
+
+        // Trigger additional events for rich text editors
+        workNotesField.dispatchEvent(new Event('focus', { bubbles: true }));
+        workNotesField.dispatchEvent(new Event('input', { bubbles: true }));
+        workNotesField.dispatchEvent(new Event('keydown', { bubbles: true }));
+        workNotesField.dispatchEvent(new Event('keyup', { bubbles: true }));
+        workNotesField.dispatchEvent(new Event('change', { bubbles: true }));
+        workNotesField.dispatchEvent(new Event('blur', { bubbles: true }));
+
+        // Check if there's a parent element that might be a rich text editor wrapper
+        const parentEditor = workNotesField.closest('[id*="work_notes"]');
+        if (parentEditor && parentEditor !== workNotesField) {
+          console.log('Found work_notes parent wrapper:', parentEditor.id);
+          // Try to find any contenteditable elements within the wrapper
+          const editableContent = parentEditor.querySelector('[contenteditable="true"]');
+          if (editableContent) {
+            console.log('Found contenteditable element, updating it too');
+            editableContent.textContent = 'updating time';
+            editableContent.innerHTML = 'updating time';
+            editableContent.dispatchEvent(new Event('input', { bubbles: true }));
+            editableContent.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+        }
+
         fieldsToUpdate.push(workNotesField);
       } else {
         console.warn('⚠ work_notes field not found, skipping');
