@@ -1,27 +1,23 @@
-// Wait for the page to fully load
-window.addEventListener('load', () => {
-    // Example: Auto-fill incident form fields
-    // Replace these selectors with actual ones from your ServiceNow instance
-    const shortDescription = document.querySelector('input[name="incident.short_description"]');
-    const description = document.querySelector('textarea[name="incident.description"]');
-    const callerId = document.querySelector('input[name="incident.caller_id"]');
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === 'fillTime') {
+      const timeValue = message.time;
   
-    if (shortDescription) {
-      shortDescription.value = 'Auto-filled short description';
-    }
-    if (description) {
-      description.value = 'Detailed auto-filled description here.';
-    }
-    if (callerId) {
-      callerId.value = 'some_user_id'; // Or dynamically fetch/set
-    }
+      // Replace with the actual selector for the time field in your ServiceNow instance
+      // E.g., for Time Worked in Incident form: inspect the element to find it (often something like 'input[name="incident.time_worked"]' or '#time_worked')
+      const timeField = document.querySelector('input[name="incident.time_worked"]'); // Adjust this!
   
-    // Trigger change events if needed for ServiceNow's scripting
-    [shortDescription, description, callerId].forEach(field => {
-      if (field) {
-        field.dispatchEvent(new Event('change', { bubbles: true }));
+      if (timeField) {
+        timeField.value = timeValue;
+  
+        // Dispatch events to trigger ServiceNow validations or updates
+        timeField.dispatchEvent(new Event('change', { bubbles: true }));
+        timeField.dispatchEvent(new Event('input', { bubbles: true }));
+  
+        console.log('Time filled:', timeValue);
+        sendResponse({ success: true });
+      } else {
+        console.error('Time field not found. Check selector.');
+        sendResponse({ success: false });
       }
-    });
-  
-    console.log('Auto-fill complete!');
+    }
   });
