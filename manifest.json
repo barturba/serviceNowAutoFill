@@ -1,11 +1,12 @@
 {
     "manifest_version": 3,
-    "name": "ServiceNow Auto-Filler",
+    "name": "ServiceNow Time Entry",
     "version": "1.0",
-    "description": "Auto-fills fields in ServiceNow forms.",
+    "description": "Allows manual selection of time to enter for ServiceNow tickets.",
     "permissions": [
       "activeTab",
-      "scripting"
+      "scripting",
+      "storage"
     ],
     "host_permissions": [
       "*://*.service-now.com/*"
