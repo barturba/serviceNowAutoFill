@@ -58,7 +58,7 @@ document.getElementById('fillBtn').addEventListener('click', () => {
         throw new Error('Invalid time value: ' + timeValue);
       }
   
-      // Get fields
+      // Get fields (updated for custom u_ prefix)
       const timeContainer = document.querySelector('[id="element.incident.time_worked"]');
       if (!timeContainer) throw new Error('Time container not found');
   
@@ -71,10 +71,10 @@ document.getElementById('fillBtn').addEventListener('click', () => {
       const hiddenTime = document.querySelector('[id="incident.time_worked"]');
       if (!hiddenTime) throw new Error('Hidden time not found');
   
-      const startField = document.querySelector('[id="incident.work_start"]');
+      const startField = document.querySelector('[id="incident.u_work_start"]');
       if (!startField) throw new Error('Work start not found');
   
-      const endField = document.querySelector('[id="incident.work_end"]');
+      const endField = document.querySelector('[id="incident.u_work_end"]');
       if (!endField) throw new Error('Work end not found');
   
       const workNotesField = document.querySelector('[id="incident.work_notes"]');
