@@ -258,8 +258,52 @@ async function fillTimeInNestedFrame(timeValue) {
 
       if (workNotesField) {
         console.log('Attempting to populate work_notes field...');
+        console.log('Field ID:', workNotesField.id);
+        console.log('Field ng-model:', workNotesField.getAttribute('ng-model'));
 
-        // Method 1: Click to activate the field
+        // Method 1: Try AngularJS scope manipulation (ServiceNow uses Angular)
+        try {
+          // Get the Angular element wrapper
+          const angular = doc.defaultView.angular;
+          if (angular) {
+            console.log('Found AngularJS, attempting to set via scope...');
+            const ngElement = angular.element(workNotesField);
+            const scope = ngElement.scope();
+
+            if (scope) {
+              console.log('Found Angular scope');
+
+              // Try different model paths based on the ng-model attribute
+              const ngModel = workNotesField.getAttribute('ng-model');
+              console.log('ng-model attribute:', ngModel);
+
+              if (ngModel) {
+                // Set the model value
+                const modelParts = ngModel.split('.');
+                let target = scope;
+                for (let i = 0; i < modelParts.length - 1; i++) {
+                  target = target[modelParts[i]];
+                  if (!target) break;
+                }
+                if (target) {
+                  target[modelParts[modelParts.length - 1]] = workNotesText;
+                  console.log('Set Angular model:', ngModel, '=', workNotesText);
+
+                  // Apply the scope changes
+                  scope.$apply();
+                  console.log('✓ Applied Angular scope changes');
+                  workNotesSetViaAPI = true;
+                }
+              }
+            }
+          } else {
+            console.log('AngularJS not found in window');
+          }
+        } catch (e) {
+          console.log('Angular scope manipulation failed:', e.message);
+        }
+
+        // Method 2: Click to activate the field
         workNotesField.click();
         workNotesField.focus();
 
@@ -269,7 +313,7 @@ async function fillTimeInNestedFrame(timeValue) {
         // Clear existing content
         workNotesField.value = '';
 
-        // Method 2: Use document.execCommand (simulates typing)
+        // Method 3: Use document.execCommand (simulates typing)
         try {
           workNotesField.select();
           document.execCommand('insertText', false, workNotesText);
@@ -278,7 +322,7 @@ async function fillTimeInNestedFrame(timeValue) {
           console.log('execCommand failed, using direct value setting:', e.message);
         }
 
-        // Method 3: Direct value setting as fallback
+        // Method 4: Direct value setting as fallback
         workNotesField.value = workNotesText;
         console.log('Set work_notes textarea value to:', workNotesText);
 
