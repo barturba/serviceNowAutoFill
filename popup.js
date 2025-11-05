@@ -28,49 +28,66 @@ function fillTimeInNestedFrame(timeValue) {
   return new Promise((resolve) => {
     console.log('Starting fillTimeInNestedFrame...');
 
-    // Helper to wait for iframe element to appear
-    function waitForIframe(timeout = 15000) {
+    // Helper to find iframe in shadow DOM
+    function findIframeInShadowDOM(timeout = 15000) {
       return new Promise((resolve, reject) => {
-        // Try to find it immediately
-        let iframe = document.getElementById('gsft_main') ||
-                     document.querySelector('iframe[name="gsft_main"]') ||
-                     document.querySelector('iframe[title*="Main Content"]');
+        const startTime = Date.now();
 
-        if (iframe) {
-          console.log('Iframe found immediately');
-          resolve(iframe);
-          return;
-        }
+        function searchForIframe() {
+          console.log('Searching for iframe in shadow DOM...');
 
-        console.log('Iframe not found, waiting for it to appear...');
+          // Helper to recursively search shadow DOM
+          function findInShadowRoots(root) {
+            // Try to find iframe in current root
+            const iframe = root.querySelector('iframe#gsft_main') ||
+                          root.querySelector('iframe[name="gsft_main"]') ||
+                          root.querySelector('iframe[title*="Main Content"]');
 
-        // Watch for it to appear
-        const observer = new MutationObserver(() => {
-          iframe = document.getElementById('gsft_main') ||
-                   document.querySelector('iframe[name="gsft_main"]') ||
-                   document.querySelector('iframe[title*="Main Content"]');
+            if (iframe) {
+              return iframe;
+            }
+
+            // Search in all shadow roots within this root
+            const allElements = root.querySelectorAll('*');
+            for (const element of allElements) {
+              if (element.shadowRoot) {
+                const found = findInShadowRoots(element.shadowRoot);
+                if (found) return found;
+              }
+            }
+
+            return null;
+          }
+
+          // Start search from document root
+          const iframe = findInShadowRoots(document);
 
           if (iframe) {
-            console.log('Iframe appeared in DOM');
-            observer.disconnect();
-            resolve(iframe);
+            console.log('Found iframe in shadow DOM!');
+            return iframe;
           }
-        });
 
-        observer.observe(document.body, {
-          childList: true,
-          subtree: true
-        });
+          // If not found and not timed out, try again
+          if (Date.now() - startTime < timeout) {
+            console.log('Iframe not found yet, retrying...');
+            setTimeout(() => {
+              const result = searchForIframe();
+              if (result) resolve(result);
+            }, 500);
+            return null;
+          } else {
+            reject(new Error('Timeout: iframe not found in shadow DOM'));
+            return null;
+          }
+        }
 
-        setTimeout(() => {
-          observer.disconnect();
-          reject(new Error('Timeout waiting for iframe to appear'));
-        }, timeout);
+        const result = searchForIframe();
+        if (result) resolve(result);
       });
     }
 
     // Wait for iframe to exist, then process it
-    waitForIframe()
+    findIframeInShadowDOM()
       .then(iframe => {
         console.log('Found iframe:', iframe);
 
@@ -206,6 +223,20 @@ function fillTimeInNestedFrame(timeValue) {
                                       await waitForElement(iframeDoc, '[id*="work_notes"]');
                 console.log('Found work_notes:', workNotesField.id);
 
+                // Find work type dropdown (optional - may not exist in all forms)
+                let workTypeField = null;
+                try {
+                  workTypeField = iframeDoc.querySelector('[id*="work_type"]') ||
+                                 iframeDoc.querySelector('select[id*="work_type"]');
+                  if (workTypeField) {
+                    console.log('Found work_type:', workTypeField.id);
+                  } else {
+                    console.log('Work type field not found (may not exist in this form)');
+                  }
+                } catch (e) {
+                  console.log('Work type field not found:', e.message);
+                }
+
                 // Fill time worked
                 const hours = Math.floor(durationSeconds / 3600).toString().padStart(2, '0');
                 const mins = Math.floor((durationSeconds % 3600) / 60).toString().padStart(2, '0');
@@ -235,8 +266,37 @@ function fillTimeInNestedFrame(timeValue) {
                 endField.value = formatDate(endTime);
                 workNotesField.value = 'time';
 
-                // Dispatch events
-                [hourInput, minInput, secInput, hiddenTime, startField, endField, workNotesField].forEach(field => {
+                // Set work type if field exists
+                if (workTypeField) {
+                  // Try to find the option with "Technical Troubleshooting" text
+                  if (workTypeField.tagName === 'SELECT') {
+                    const options = Array.from(workTypeField.options);
+                    const targetOption = options.find(opt =>
+                      opt.text.includes('Technical Troubleshooting') ||
+                      opt.text.includes('Diagnostics')
+                    );
+
+                    if (targetOption) {
+                      workTypeField.value = targetOption.value;
+                      console.log('Set work_type to:', targetOption.text);
+                    } else {
+                      console.log('Could not find "Technical Troubleshooting & Diagnostics" option. Available options:',
+                        options.map(opt => opt.text));
+                    }
+                  } else {
+                    // If it's an input field (reference field), set the display value
+                    workTypeField.value = 'Technical Troubleshooting & Diagnostics';
+                    console.log('Set work_type value to: Technical Troubleshooting & Diagnostics');
+                  }
+                }
+
+                // Dispatch events on all fields
+                const fieldsToUpdate = [hourInput, minInput, secInput, hiddenTime, startField, endField, workNotesField];
+                if (workTypeField) {
+                  fieldsToUpdate.push(workTypeField);
+                }
+
+                fieldsToUpdate.forEach(field => {
                   field.dispatchEvent(new Event('input', { bubbles: true }));
                   field.dispatchEvent(new Event('change', { bubbles: true }));
                   field.dispatchEvent(new Event('blur', { bubbles: true }));

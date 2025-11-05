@@ -111,7 +111,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         secInput.value = secs;
         hiddenTime.value = `${hours}:${mins}:${secs}`;
 
-        const now = new Date(2025, 10, 5);
+        const now = new Date();
         const endTime = now;
         const startTime = new Date(now.getTime() - durationSeconds * 1000);
 
@@ -122,7 +122,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           const hours = d.getHours().toString().padStart(2, '0');
           const mins = d.getMinutes().toString().padStart(2, '0');
           const secs = d.getSeconds().toString().padStart(2, '0');
-          return `${month}/${day}/${year} ${hours}:${mins}:${secs}`;
+          return `${year}-${month}-${day} ${hours}:${mins}:${secs}`;
         }
 
         startField.value = formatDate(startTime);
