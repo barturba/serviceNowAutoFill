@@ -3,6 +3,12 @@ console.log('Content script loaded in frame:', location.href); // For debugging
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'fillTime') {
     try {
+      // Only process if in the incident form frame
+      if (!location.href.includes('incident.do')) {
+        sendResponse({ success: false });
+        return true;
+      }
+
       const timeValue = message.time;
 
       // Parse the time input to seconds
@@ -32,13 +38,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       const workNotesField = document.querySelector('#incident\\.work_notes');
 
       if (!timeField || !startField || !endField || !workNotesField) {
-        console.warn('Not in incident form frame or fields not found.');
         sendResponse({ success: false });
-        return true; // Keep port open for async if needed
+        return true;
       }
 
-      // Calculate start and end times (using provided current date: November 05, 2025)
-      const now = new Date(2025, 10, 5); // Month is 0-indexed (10 = November)
+      // Calculate start and end times (using November 05, 2025 as current date)
+      const now = new Date(2025, 10, 5); // Month 10 = November
       const endTime = now;
       const startTime = new Date(now.getTime() - durationSeconds * 1000);
 
