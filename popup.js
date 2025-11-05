@@ -116,13 +116,15 @@ async function fillTimeInNestedFrame(timeValue) {
       if (!hiddenTime) throw new Error('Hidden time field not found');
       console.log('Found hidden time:', hiddenTime.id);
 
-      // Debug: log all elements with work_start/work_end in ID
+      // Debug: log all elements with work_start/work_end/work_notes/work_type in ID
       const allWorkStartElements = doc.querySelectorAll('[id*="work_start"]');
       const allWorkEndElements = doc.querySelectorAll('[id*="work_end"]');
       const allWorkNotesElements = doc.querySelectorAll('[id*="work_notes"]');
+      const allWorkTypeElements = doc.querySelectorAll('[id*="work_type"]');
       console.log('All work_start elements:', Array.from(allWorkStartElements).map(e => ({ id: e.id, tag: e.tagName, type: e.type })));
       console.log('All work_end elements:', Array.from(allWorkEndElements).map(e => ({ id: e.id, tag: e.tagName, type: e.type })));
       console.log('All work_notes elements:', Array.from(allWorkNotesElements).map(e => ({ id: e.id, tag: e.tagName, type: e.type })));
+      console.log('All work_type elements:', Array.from(allWorkTypeElements).map(e => ({ id: e.id, tag: e.tagName, type: e.type })));
 
       // Try multiple selectors in order of specificity for start field
       let startField = doc.querySelector('input[id="incident.u_work_start"]') ||
@@ -157,6 +159,7 @@ async function fillTimeInNestedFrame(timeValue) {
       // Work notes - try to find textarea or input, not wrapper div
       let workNotesField = doc.querySelector('textarea[id="incident.work_notes"]') ||
                           doc.querySelector('textarea[id$="work_notes"]') ||
+                          doc.querySelector('textarea[name="incident.work_notes"]') ||
                           doc.querySelector('input[id="incident.work_notes"]') ||
                           doc.querySelector('textarea[id*="work_notes"]') ||
                           doc.querySelector('input[id*="work_notes"]');
@@ -169,6 +172,24 @@ async function fillTimeInNestedFrame(timeValue) {
         }
       }
       console.log('Found work_notes:', workNotesField?.id, 'tag:', workNotesField?.tagName);
+
+      // Work type - try to find select dropdown or input
+      let workTypeField = doc.querySelector('select[id="incident.u_work_type"]') ||
+                         doc.querySelector('select[name="incident.u_work_type"]') ||
+                         doc.querySelector('select[id$="u_work_type"]') ||
+                         doc.querySelector('select[id*="work_type"]') ||
+                         doc.querySelector('input[id="incident.u_work_type"]') ||
+                         doc.querySelector('input[id$="u_work_type"]') ||
+                         doc.querySelector('input[id*="work_type"]');
+      if (!workTypeField) {
+        console.log('Waiting for work_type field...');
+        try {
+          workTypeField = await waitForElement(doc, 'select[id*="work_type"], input[id*="work_type"]');
+        } catch (e) {
+          console.log('Could not find work_type field:', e.message);
+        }
+      }
+      console.log('Found work_type:', workTypeField?.id, 'tag:', workTypeField?.tagName, 'type:', workTypeField?.type);
 
       // Fill time worked
       const hours = Math.floor(durationSeconds / 3600).toString().padStart(2, '0');
@@ -215,6 +236,33 @@ async function fillTimeInNestedFrame(timeValue) {
         fieldsToUpdate.push(workNotesField);
       } else {
         console.warn('⚠ work_notes field not found, skipping');
+      }
+      if (workTypeField) {
+        // For select dropdown, try to set to a common value like "Planned" or first available option
+        if (workTypeField.tagName === 'SELECT') {
+          // Try to find and select "Planned" or "Work" option
+          const options = Array.from(workTypeField.options);
+          console.log('Available work_type options:', options.map(o => ({ value: o.value, text: o.text })));
+
+          // Try to select "Planned" or "Work" or first non-empty option
+          let selectedOption = options.find(o => o.text.toLowerCase().includes('planned')) ||
+                              options.find(o => o.text.toLowerCase().includes('work')) ||
+                              options.find(o => o.value && o.value !== '');
+
+          if (selectedOption) {
+            workTypeField.value = selectedOption.value;
+            console.log('Set work_type to:', selectedOption.text, '(value:', selectedOption.value + ')');
+          } else {
+            console.warn('⚠ No suitable work_type option found');
+          }
+        } else {
+          // If it's an input field, set it to "Planned"
+          workTypeField.value = 'Planned';
+          console.log('Set work_type to: Planned');
+        }
+        fieldsToUpdate.push(workTypeField);
+      } else {
+        console.warn('⚠ work_type field not found, skipping');
       }
 
       // Dispatch events on all fields that were successfully found and updated
