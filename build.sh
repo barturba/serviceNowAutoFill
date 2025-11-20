@@ -24,13 +24,24 @@ fi
 
 # Create zip file with extension files (exclude git, build dir, scripts, and docs)
 echo "Creating zip file..."
+
+# Check if icons exist and include them
+ICON_FILES=""
+if [ -f "icon16.png" ] && [ -f "icon48.png" ] && [ -f "icon128.png" ]; then
+  ICON_FILES="icon16.png icon48.png icon128.png"
+  echo "Including icon files..."
+else
+  echo "⚠ Warning: Icon files not found. Run generate-icons.html to create them."
+fi
+
 zip -r "$BUILD_DIR/$ZIP_NAME" \
   manifest.json \
   popup.html \
   popup.js \
   config.js \
   developer-tools.js \
-  -x "*.git*" "build/*" "*.sh" "*.md" "*.DS_Store" "STORE_LISTING.md"
+  $ICON_FILES \
+  -x "*.git*" "build/*" "*.sh" "*.md" "*.DS_Store" "*.html"
 
 echo "✓ Build complete: $BUILD_DIR/$ZIP_NAME"
 echo ""

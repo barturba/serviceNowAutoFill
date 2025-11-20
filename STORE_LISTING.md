@@ -92,7 +92,7 @@ https://github.com/barturba/serviceNowAutoFill
 
 **Support Email:**
 ```
-[Your email here]
+bartisimo@gmail.com
 ```
 
 **Visibility:**
