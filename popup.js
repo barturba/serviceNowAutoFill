@@ -280,14 +280,23 @@ async function fillTimeInNestedFrame(timeValue) {
 
       // Check if g_form (ServiceNow's form API) is available
       if (typeof doc.defaultView.g_form !== 'undefined' && doc.defaultView.g_form) {
-        console.log('Found ServiceNow g_form API, using it to set work_notes');
+        console.log('Found ServiceNow g_form API, checking for existing work_notes content');
         try {
-          // Try to set using GlideForm API
-          doc.defaultView.g_form.setValue('work_notes', workNotesText);
-          console.log('✓ Set work_notes using g_form.setValue()');
-          workNotesSetViaAPI = true;
+          // Get existing work_notes value
+          const existingWorkNotes = doc.defaultView.g_form.getValue('work_notes') || '';
+          console.log('Existing work_notes value from g_form:', existingWorkNotes);
+
+          // Only set if there's no existing content
+          if (!existingWorkNotes) {
+            doc.defaultView.g_form.setValue('work_notes', workNotesText);
+            console.log('✓ Set work_notes using g_form.setValue()');
+            workNotesSetViaAPI = true;
+          } else {
+            console.log('✓ Preserving existing work_notes content, skipping g_form.setValue()');
+            workNotesSetViaAPI = false; // Let direct manipulation preserve the content
+          }
         } catch (e) {
-          console.log('g_form.setValue failed:', e.message);
+          console.log('g_form operations failed:', e.message);
         }
       } else {
         console.log('g_form API not available, will use direct field manipulation');
@@ -297,6 +306,14 @@ async function fillTimeInNestedFrame(timeValue) {
         console.log('Attempting to populate work_notes field...');
         console.log('Field ID:', workNotesField.id);
         console.log('Field ng-model:', workNotesField.getAttribute('ng-model'));
+
+        // Preserve existing content
+        const existingContent = workNotesField.value || '';
+        console.log('Existing work_notes content:', existingContent);
+
+        // Combine existing content with new text (add newline if there's existing content)
+        const finalWorkNotesText = existingContent ? existingContent : workNotesText;
+        console.log('Final work_notes text to set:', finalWorkNotesText);
 
         // Method 1: Try AngularJS scope manipulation (ServiceNow uses Angular)
         try {
@@ -316,7 +333,7 @@ async function fillTimeInNestedFrame(timeValue) {
               console.log('ng-model attribute:', ngModel);
 
               if (ngModel) {
-                // Set the model value
+                // Set the model value (preserve existing content)
                 const modelParts = ngModel.split('.');
                 let target = scope;
                 for (let i = 0; i < modelParts.length - 1; i++) {
@@ -324,8 +341,8 @@ async function fillTimeInNestedFrame(timeValue) {
                   if (!target) break;
                 }
                 if (target) {
-                  target[modelParts[modelParts.length - 1]] = workNotesText;
-                  console.log('Set Angular model:', ngModel, '=', workNotesText);
+                  target[modelParts[modelParts.length - 1]] = finalWorkNotesText;
+                  console.log('Set Angular model:', ngModel, '=', finalWorkNotesText);
 
                   // Apply the scope changes (use $evalAsync if $apply fails)
                   try {
@@ -368,21 +385,30 @@ async function fillTimeInNestedFrame(timeValue) {
         // Wait a moment for field to become active
         await new Promise(resolve => setTimeout(resolve, 100));
 
-        // Clear existing content
-        workNotesField.value = '';
+        // Don't clear existing content - preserve it!
+        // (removed: workNotesField.value = '';)
 
-        // Method 3: Use document.execCommand (simulates typing)
-        try {
-          workNotesField.select();
-          document.execCommand('insertText', false, workNotesText);
-          console.log('Used execCommand to insert text');
-        } catch (e) {
-          console.log('execCommand failed, using direct value setting:', e.message);
+        // Method 3: Use document.execCommand (simulates typing) - only if no existing content
+        if (!existingContent) {
+          try {
+            workNotesField.select();
+            document.execCommand('insertText', false, finalWorkNotesText);
+            console.log('Used execCommand to insert text');
+          } catch (e) {
+            console.log('execCommand failed, using direct value setting:', e.message);
+          }
         }
 
-        // Method 4: Direct value setting as fallback
-        workNotesField.value = workNotesText;
-        console.log('Set work_notes textarea value to:', workNotesText);
+        // Method 4: Direct value setting (preserve existing content)
+        if (existingContent) {
+          // If there's existing content, keep it as-is
+          workNotesField.value = existingContent;
+          console.log('Preserved existing work_notes content:', existingContent);
+        } else {
+          // If no existing content, set the new text
+          workNotesField.value = finalWorkNotesText;
+          console.log('Set work_notes textarea value to:', finalWorkNotesText);
+        }
 
         // Trigger comprehensive events
         const events = ['click', 'focus', 'keydown', 'keypress', 'input', 'keyup', 'change', 'blur'];
@@ -396,7 +422,7 @@ async function fillTimeInNestedFrame(timeValue) {
           bubbles: true,
           cancelable: true,
           inputType: 'insertText',
-          data: workNotesText
+          data: finalWorkNotesText
         });
         workNotesField.dispatchEvent(inputEvent);
 
@@ -407,19 +433,27 @@ async function fillTimeInNestedFrame(timeValue) {
 
       // Update contenteditable element if found (for visual rich text editor)
       if (workNotesEditable) {
-        console.log('Updating contenteditable work_notes element...');
-        workNotesEditable.focus();
-        workNotesEditable.textContent = workNotesText;
-        workNotesEditable.innerHTML = workNotesText;
+        console.log('Checking contenteditable work_notes element...');
+        const existingEditableContent = workNotesEditable.textContent || workNotesEditable.innerText || '';
+        console.log('Existing contenteditable content:', existingEditableContent);
 
-        // Trigger events on the contenteditable element
-        workNotesEditable.dispatchEvent(new Event('focus', { bubbles: true }));
-        workNotesEditable.dispatchEvent(new Event('input', { bubbles: true }));
-        workNotesEditable.dispatchEvent(new Event('keydown', { bubbles: true }));
-        workNotesEditable.dispatchEvent(new Event('keyup', { bubbles: true }));
-        workNotesEditable.dispatchEvent(new Event('change', { bubbles: true }));
-        workNotesEditable.dispatchEvent(new Event('blur', { bubbles: true }));
-        console.log('Set work_notes contenteditable to:', workNotesText);
+        // Only update if there's no existing content
+        if (!existingEditableContent.trim()) {
+          workNotesEditable.focus();
+          workNotesEditable.textContent = workNotesText;
+          workNotesEditable.innerHTML = workNotesText;
+
+          // Trigger events on the contenteditable element
+          workNotesEditable.dispatchEvent(new Event('focus', { bubbles: true }));
+          workNotesEditable.dispatchEvent(new Event('input', { bubbles: true }));
+          workNotesEditable.dispatchEvent(new Event('keydown', { bubbles: true }));
+          workNotesEditable.dispatchEvent(new Event('keyup', { bubbles: true }));
+          workNotesEditable.dispatchEvent(new Event('change', { bubbles: true }));
+          workNotesEditable.dispatchEvent(new Event('blur', { bubbles: true }));
+          console.log('Set work_notes contenteditable to:', workNotesText);
+        } else {
+          console.log('✓ Preserving existing contenteditable content');
+        }
       } else {
         // If no direct contenteditable found, check parent wrapper
         if (workNotesField) {
@@ -428,14 +462,22 @@ async function fillTimeInNestedFrame(timeValue) {
             console.log('Found work_notes parent wrapper:', parentEditor.id);
             const editableContent = parentEditor.querySelector('[contenteditable="true"]');
             if (editableContent) {
-              console.log('Found contenteditable element in wrapper, updating it too');
-              editableContent.focus();
-              editableContent.textContent = workNotesText;
-              editableContent.innerHTML = workNotesText;
-              editableContent.dispatchEvent(new Event('focus', { bubbles: true }));
-              editableContent.dispatchEvent(new Event('input', { bubbles: true }));
-              editableContent.dispatchEvent(new Event('change', { bubbles: true }));
-              editableContent.dispatchEvent(new Event('blur', { bubbles: true }));
+              const existingWrapperContent = editableContent.textContent || editableContent.innerText || '';
+              console.log('Existing wrapper contenteditable content:', existingWrapperContent);
+
+              // Only update if there's no existing content
+              if (!existingWrapperContent.trim()) {
+                console.log('Found contenteditable element in wrapper, updating it');
+                editableContent.focus();
+                editableContent.textContent = workNotesText;
+                editableContent.innerHTML = workNotesText;
+                editableContent.dispatchEvent(new Event('focus', { bubbles: true }));
+                editableContent.dispatchEvent(new Event('input', { bubbles: true }));
+                editableContent.dispatchEvent(new Event('change', { bubbles: true }));
+                editableContent.dispatchEvent(new Event('blur', { bubbles: true }));
+              } else {
+                console.log('✓ Preserving existing wrapper contenteditable content');
+              }
             }
           }
         }
