@@ -41,7 +41,7 @@ zip -r "$BUILD_DIR/$ZIP_NAME" \
   config.js \
   developer-tools.js \
   $ICON_FILES \
-  -x "*.git*" "build/*" "*.sh" "*.md" "*.DS_Store" "*.html"
+  -x "*.git*" "build/*" "*.sh" "*.md" "*.DS_Store" "generate-icons.html"
 
 echo "✓ Build complete: $BUILD_DIR/$ZIP_NAME"
 echo ""

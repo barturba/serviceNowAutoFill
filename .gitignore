@@ -1,6 +1,9 @@
 # Build directory
 build/
 
+# Screenshots
+screenshots/
+
 # macOS
 .DS_Store
 
