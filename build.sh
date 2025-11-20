@@ -22,7 +22,7 @@ if [ -f "$BUILD_DIR/$ZIP_NAME" ]; then
   rm "$BUILD_DIR/$ZIP_NAME"
 fi
 
-# Create zip file with extension files (exclude git, build dir, and scripts)
+# Create zip file with extension files (exclude git, build dir, scripts, and docs)
 echo "Creating zip file..."
 zip -r "$BUILD_DIR/$ZIP_NAME" \
   manifest.json \
@@ -30,7 +30,7 @@ zip -r "$BUILD_DIR/$ZIP_NAME" \
   popup.js \
   config.js \
   developer-tools.js \
-  -x "*.git*" "build/*" "*.sh" "*.md" "*.DS_Store"
+  -x "*.git*" "build/*" "*.sh" "*.md" "*.DS_Store" "STORE_LISTING.md"
 
 echo "✓ Build complete: $BUILD_DIR/$ZIP_NAME"
 echo ""
