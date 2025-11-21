@@ -6,7 +6,6 @@
     "permissions": [
       "activeTab",
       "scripting",
-      "webNavigation"
     ],
     "host_permissions": [
       "*://*.service-now.com/*"
