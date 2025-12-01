@@ -178,3 +178,79 @@ window.FieldFinder.findTimeWorkedFields = async function(doc) {
   return { container: timeContainer, hourInput, minInput, secInput, hiddenTime };
 };
 
+/**
+ * Find state field in document
+ * @param {Document} doc - Document to search
+ * @returns {Promise<HTMLElement|null>} The state field or null
+ */
+window.FieldFinder.findStateField = async function(doc) {
+  let stateField = doc.querySelector('select[id$=".state"]') ||
+                  doc.querySelector('select[id$="state"]') ||
+                  doc.querySelector('select[name$=".state"]') ||
+                  doc.querySelector('select[id*="state"]') ||
+                  doc.querySelector('input[id$=".state"]') ||
+                  doc.querySelector('input[id*="state"]');
+  if (!stateField) {
+    console.log('Waiting for state field...');
+    try {
+      stateField = await window.FieldFinder.waitForElement(doc, 'select[id$=".state"], select[id$="state"], select[id*="state"], input[id*="state"]');
+    } catch (e) {
+      console.log('Could not find state field:', e.message);
+    }
+  }
+  console.log('Found state:', stateField?.id, 'tag:', stateField?.tagName, 'type:', stateField?.type);
+  return stateField;
+};
+
+/**
+ * Find resolution_code field in document
+ * @param {Document} doc - Document to search
+ * @returns {Promise<HTMLElement|null>} The resolution_code field or null
+ */
+window.FieldFinder.findResolutionCodeField = async function(doc) {
+  let resolutionCodeField = doc.querySelector('select[id$=".close_code"]') ||
+                           doc.querySelector('select[id$="close_code"]') ||
+                           doc.querySelector('select[name$=".close_code"]') ||
+                           doc.querySelector('select[id*="close_code"]') ||
+                           doc.querySelector('select[id$=".resolution_code"]') ||
+                           doc.querySelector('select[id$="resolution_code"]') ||
+                           doc.querySelector('input[id*="close_code"]') ||
+                           doc.querySelector('input[id*="resolution_code"]');
+  if (!resolutionCodeField) {
+    console.log('Waiting for resolution_code field...');
+    try {
+      resolutionCodeField = await window.FieldFinder.waitForElement(doc, 'select[id$=".close_code"], select[id$="close_code"], select[id*="close_code"], select[id*="resolution_code"]');
+    } catch (e) {
+      console.log('Could not find resolution_code field:', e.message);
+    }
+  }
+  console.log('Found resolution_code:', resolutionCodeField?.id, 'tag:', resolutionCodeField?.tagName, 'type:', resolutionCodeField?.type);
+  return resolutionCodeField;
+};
+
+/**
+ * Find close_notes/resolution_notes field in document
+ * @param {Document} doc - Document to search
+ * @returns {Promise<HTMLElement|null>} The close_notes field or null
+ */
+window.FieldFinder.findCloseNotesField = async function(doc) {
+  let closeNotesField = doc.querySelector('textarea[id$=".close_notes"]') ||
+                       doc.querySelector('textarea[id$="close_notes"]') ||
+                       doc.querySelector('textarea[name$=".close_notes"]') ||
+                       doc.querySelector('textarea[id*="close_notes"]') ||
+                       doc.querySelector('textarea[id$=".resolution_notes"]') ||
+                       doc.querySelector('textarea[id*="resolution_notes"]') ||
+                       doc.querySelector('input[id*="close_notes"]') ||
+                       doc.querySelector('input[id*="resolution_notes"]');
+  if (!closeNotesField) {
+    console.log('Waiting for close_notes field...');
+    try {
+      closeNotesField = await window.FieldFinder.waitForElement(doc, 'textarea[id$=".close_notes"], textarea[id$="close_notes"], textarea[id*="close_notes"], textarea[id*="resolution_notes"]');
+    } catch (e) {
+      console.log('Could not find close_notes field:', e.message);
+    }
+  }
+  console.log('Found close_notes:', closeNotesField?.id, 'tag:', closeNotesField?.tagName, 'type:', closeNotesField?.type);
+  return closeNotesField;
+};
+

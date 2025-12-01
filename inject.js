@@ -47,6 +47,48 @@ async function fillTimeInNestedFrame(timeValue) {
   }
 }
 
-// Make function available globally for chrome.scripting.executeScript
+/**
+ * Function to process alert cleared workflow
+ * @returns {Promise<{success: boolean, error?: string}>}
+ */
+async function processAlertCleared() {
+  console.log('Starting processAlertCleared...');
+  console.log('Current URL:', window.location.href);
+
+  // Check that required functions are available
+  if (!window.FormFiller || !window.FormFiller.processAlertCleared) {
+    throw new Error('FormFiller.processAlertCleared not found. Make sure utils modules are injected.');
+  }
+  if (!window.IframeFinder || !window.IframeFinder.findIframeInDOM) {
+    throw new Error('IframeFinder.findIframeInDOM not found. Make sure utils modules are injected.');
+  }
+  if (!window.IframeFinder || !window.IframeFinder.waitForIframeLoad) {
+    throw new Error('IframeFinder.waitForIframeLoad not found. Make sure utils modules are injected.');
+  }
+
+  // First, check if we're already in the incident form (no iframe needed)
+  const directTimeField = document.querySelector('[id*="time_worked"]');
+  const directWorkStart = document.querySelector('[id*="work_start"]');
+  if (directTimeField || directWorkStart) {
+    console.log('✓ Found incident form fields directly in current document (no iframe needed)');
+    return await window.FormFiller.processAlertCleared(document);
+  }
+
+  console.log('Fields not in current document, searching for iframe...');
+
+  try {
+    const iframe = await window.IframeFinder.findIframeInDOM();
+    console.log('✓ Found iframe:', iframe);
+
+    const iframeDoc = await window.IframeFinder.waitForIframeLoad(iframe);
+    return await window.FormFiller.processAlertCleared(iframeDoc);
+  } catch (error) {
+    console.error('Error finding or accessing iframe:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// Make functions available globally for chrome.scripting.executeScript
 window.fillTimeInNestedFrame = fillTimeInNestedFrame;
+window.processAlertCleared = processAlertCleared;
 

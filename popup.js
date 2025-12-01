@@ -60,3 +60,59 @@ document.querySelectorAll('.time-btn').forEach(button => {
     });
   });
 });
+
+// Handle alert cleared button click
+document.querySelectorAll('.alert-cleared-btn').forEach(button => {
+  button.addEventListener('click', () => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const tabId = tabs[0].id;
+      
+      // Inject all module files in order, then the main function
+      chrome.scripting.executeScript({
+        target: { tabId },
+        files: [
+          'utils/timeParser.js',
+          'utils/fieldFinder.js',
+          'utils/iframeFinder.js',
+          'utils/formFiller.js',
+          'inject.js'
+        ]
+      }, () => {
+        if (chrome.runtime.lastError) {
+          console.error(chrome.runtime.lastError);
+          alert('Error: ' + chrome.runtime.lastError.message);
+          return;
+        }
+
+        // Now execute the alert cleared function
+        chrome.scripting.executeScript({
+          target: { tabId },
+          func: () => {
+            // Call the function that was injected
+            if (window.processAlertCleared) {
+              return window.processAlertCleared();
+            } else {
+              throw new Error('processAlertCleared not found');
+            }
+          }
+        }, (results) => {
+          if (chrome.runtime.lastError) {
+            console.error(chrome.runtime.lastError);
+            alert('Error: ' + chrome.runtime.lastError.message);
+          } else if (results && results[0].result) {
+            const result = results[0].result;
+            if (result.success) {
+              // Close popup on success
+              window.close();
+            } else {
+              alert('Failed: ' + (result.error || 'Unknown error'));
+            }
+          } else {
+            // Close popup if no results (script injected successfully)
+            window.close();
+          }
+        });
+      });
+    });
+  });
+});
