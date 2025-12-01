@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "ServiceNow Time Entry Assistant",
-    "version": "2.1",
+    "version": "2.2",
     "description": "One-click time entry for ServiceNow incidents and tasks. Choose 15min, 30min, 45min, 1hr, 1.5hr, or 2hr durations.",
     "permissions": [
       "activeTab",
