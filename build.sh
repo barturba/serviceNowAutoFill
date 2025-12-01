@@ -38,10 +38,10 @@ zip -r "$BUILD_DIR/$ZIP_NAME" \
   manifest.json \
   popup.html \
   popup.js \
-  config.js \
-  developer-tools.js \
+  inject.js \
+  utils/*.js \
   $ICON_FILES \
-  -x "*.git*" "build/*" "*.sh" "*.md" "*.DS_Store" "generate-icons.html"
+  -x "*.git*" "build/*" "*.sh" "*.md" "*.DS_Store" "dev-tools/*" "docs/*"
 
 echo "✓ Build complete: $BUILD_DIR/$ZIP_NAME"
 echo ""

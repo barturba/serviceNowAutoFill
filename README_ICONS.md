@@ -4,7 +4,7 @@
 
 1. **Open the icon generator:**
    ```bash
-   open generate-icons.html
+   open dev-tools/generate-icons.html
    ```
 
 2. **Download the icons:**
@@ -57,5 +57,5 @@ If you prefer to create custom icons:
 - Verify PNG format (not JPEG or other formats)
 
 **Build warning about missing icons?**
-- Run `generate-icons.html` and download the icons
+- Run `dev-tools/generate-icons.html` and download the icons
 - Move them from Downloads to the extension directory
