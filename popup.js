@@ -61,6 +61,64 @@ document.querySelectorAll('.time-btn').forEach(button => {
   });
 });
 
+// Get all time-save buttons (green buttons) and add click listeners
+document.querySelectorAll('.time-save-btn').forEach(button => {
+  button.addEventListener('click', () => {
+    const timeValue = button.getAttribute('data-time');
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const tabId = tabs[0].id;
+      
+      // Inject all module files in order, then the main function
+      chrome.scripting.executeScript({
+        target: { tabId },
+        files: [
+          'utils/timeParser.js',
+          'utils/fieldFinder.js',
+          'utils/iframeFinder.js',
+          'utils/formFiller.js',
+          'inject.js'
+        ]
+      }, () => {
+        if (chrome.runtime.lastError) {
+          console.error(chrome.runtime.lastError);
+          alert('Error: ' + chrome.runtime.lastError.message);
+          return;
+        }
+
+        // Now execute the function with the time value
+        chrome.scripting.executeScript({
+          target: { tabId },
+          func: (timeValue) => {
+            // Call the function that was injected
+            if (window.fillTimeInNestedFrameAndSave) {
+              return window.fillTimeInNestedFrameAndSave(timeValue);
+            } else {
+              throw new Error('fillTimeInNestedFrameAndSave not found');
+            }
+          },
+          args: [timeValue]
+        }, (results) => {
+          if (chrome.runtime.lastError) {
+            console.error(chrome.runtime.lastError);
+            alert('Error: ' + chrome.runtime.lastError.message);
+          } else if (results && results[0].result) {
+            const result = results[0].result;
+            if (result.success) {
+              // Close popup on success
+              window.close();
+            } else {
+              alert('Failed: ' + (result.error || 'Unknown error'));
+            }
+          } else {
+            // Close popup if no results (script injected successfully)
+            window.close();
+          }
+        });
+      });
+    });
+  });
+});
+
 // Handle alert cleared button click
 document.querySelectorAll('.alert-cleared-btn').forEach(button => {
   button.addEventListener('click', () => {

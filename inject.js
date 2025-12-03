@@ -88,7 +88,93 @@ async function processAlertCleared() {
   }
 }
 
+/**
+ * Main function injected into page context to fill time entry form and then click Save
+ * @param {string} timeValue - Time duration string (e.g., "15 minutes")
+ * @returns {Promise<{success: boolean, error?: string}>}
+ */
+async function fillTimeInNestedFrameAndSave(timeValue) {
+  console.log('Starting fillTimeInNestedFrameAndSave...');
+  console.log('Current URL:', window.location.href);
+
+  // First, fill the time entry form using the existing function
+  const fillResult = await fillTimeInNestedFrame(timeValue);
+  
+  if (!fillResult.success) {
+    console.error('Failed to fill time entry:', fillResult.error);
+    return fillResult;
+  }
+
+  console.log('✓ Time entry filled successfully, now clicking Save button...');
+
+  // Wait a moment for form fields to be fully updated
+  await new Promise(resolve => setTimeout(resolve, 200));
+
+  // Find and click the Save button
+  // The Save button has id="sysverb_update_and_stay" and onclick="return gsftSubmit(this);"
+  let saveButton = null;
+  
+  // Try to find the Save button in the current document
+  saveButton = document.querySelector('#sysverb_update_and_stay');
+  
+  // If not found, try searching in iframes
+  if (!saveButton) {
+    console.log('Save button not found in main document, searching in iframes...');
+    const iframes = document.querySelectorAll('iframe');
+    for (const iframe of iframes) {
+      try {
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        saveButton = iframeDoc.querySelector('#sysverb_update_and_stay');
+        if (saveButton) {
+          console.log('✓ Found Save button in iframe');
+          break;
+        }
+      } catch (e) {
+        // Cross-origin iframe, skip
+        console.log('Cannot access iframe:', e.message);
+      }
+    }
+  }
+
+  // Also try using the IframeFinder utility if available
+  if (!saveButton && window.IframeFinder) {
+    try {
+      const iframe = await window.IframeFinder.findIframeInDOM();
+      if (iframe) {
+        const iframeDoc = await window.IframeFinder.waitForIframeLoad(iframe);
+        saveButton = iframeDoc.querySelector('#sysverb_update_and_stay');
+        if (saveButton) {
+          console.log('✓ Found Save button using IframeFinder');
+        }
+      }
+    } catch (e) {
+      console.log('Error finding iframe for Save button:', e.message);
+    }
+  }
+
+  if (saveButton) {
+    console.log('Clicking Save button...');
+    try {
+      // Click the button - ServiceNow's onclick handler will call gsftSubmit(this)
+      saveButton.click();
+      console.log('✓ Save button clicked successfully');
+      
+      // Wait a moment to ensure the click was processed
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      return { success: true };
+    } catch (error) {
+      console.error('Error clicking Save button:', error);
+      return { success: false, error: 'Failed to click Save button: ' + error.message };
+    }
+  } else {
+    console.warn('⚠ Save button (#sysverb_update_and_stay) not found');
+    return { success: false, error: 'Save button not found on page' };
+  }
+}
+
 // Make functions available globally for chrome.scripting.executeScript
 window.fillTimeInNestedFrame = fillTimeInNestedFrame;
 window.processAlertCleared = processAlertCleared;
+window.fillTimeInNestedFrameAndSave = fillTimeInNestedFrameAndSave;
 

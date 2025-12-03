@@ -13,7 +13,7 @@ ServiceNow Time Entry Assistant
 
 **Summary / Short Description:** (114 characters)
 ```
-One-click time entry for ServiceNow incidents and tasks. Choose 15min, 30min, 45min, 1hr, 1.5hr, or 2hr durations.
+One-click time entry and alert resolution for ServiceNow. Quick time buttons plus automated alert cleared workflow.
 ```
 
 ---
@@ -36,17 +36,27 @@ ServiceNow Time Entry Assistant streamlines time tracking for ServiceNow users b
 
 KEY FEATURES:
 • Quick time entry buttons: 15min, 30min, 45min, 1hr, 1.5hr, 2hr
+• Alert Cleared workflow: One-click button that automates alert resolution
+  - Sets time to 15 minutes
+  - Adds "Alert cleared. Closing ticket." to work notes
+  - Sets state to "Resolved"
+  - Opens Resolution Information tab
+  - Sets resolution code to "Resolved - permanently"
+  - Fills resolution notes automatically
 • Automatically fills time_worked, work_start, work_end fields
 • Preserves existing work notes
 • Auto-populates work_type field
 • Works with incidents, catalog tasks, and other ServiceNow tables
 • Compatible with both classic and modern ServiceNow UIs
+• Smart scroll preservation - maintains your page position during automation
 
 HOW IT WORKS:
 1. Open any ServiceNow incident or task
 2. Click the extension icon
-3. Select your time duration
-4. All time fields are automatically populated
+3. Choose your action:
+   - Select a time duration (15min-2hr) for quick time entry
+   - Click "Alert Cleared" for automated alert resolution workflow
+4. All fields are automatically populated without page scrolling
 
 SUPPORTED FIELDS:
 • time_worked (hours:minutes:seconds)
@@ -54,8 +64,11 @@ SUPPORTED FIELDS:
 • u_work_end (end timestamp)
 • work_notes (preserves existing content)
 • u_work_type (auto-selects appropriate type)
+• state (for alert resolution)
+• close_code / resolution_code (for alert resolution)
+• close_notes / resolution_notes (for alert resolution)
 
-Perfect for ServiceNow administrators, technicians, and support staff who need to quickly log time entries without manual field entry.
+Perfect for ServiceNow administrators, technicians, and support staff who need to quickly log time entries and resolve alerts without manual field entry. The Alert Cleared workflow is especially useful for teams handling high volumes of alerts that need consistent resolution documentation.
 
 Note: This extension only works on *.service-now.com domains.
 ```
@@ -116,5 +129,5 @@ Recommended: Simple clock or timer icon with ServiceNow colors (green/teal).
 ## Tags / Keywords (if prompted)
 
 ```
-servicenow, time entry, productivity, automation, time tracking, incident management, itsm
+servicenow, time entry, productivity, automation, time tracking, incident management, itsm, alert resolution, ticket closure
 ```
