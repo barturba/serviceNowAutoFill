@@ -27,7 +27,9 @@ async function clickSaveButton() {
     const wasDisabledBefore = saveButton.disabled;
     saveButton.click();
     console.log('✓ Save button clicked');
-    await new Promise(resolve => setTimeout(resolve, 200));
+    
+    // Wait a bit longer to allow the page to react to the click
+    await new Promise(resolve => setTimeout(resolve, 300));
     
     if (window.verifySaveTriggered(saveButton, wasDisabledBefore)) {
       return { success: true };
