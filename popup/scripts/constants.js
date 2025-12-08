@@ -5,7 +5,7 @@
 const REQUIRED_FILES = [
   // Core parsers and utilities (must load first)
   'utils/parsers/timeParser.js',
-  'utils/fields/fieldFinder.js',
+  'utils/fields/core/fieldFinder.js',
   
   // Field finders (depend on fieldFinder.js)
   'utils/fields/finders/workStartFinder.js',
@@ -16,6 +16,7 @@ const REQUIRED_FILES = [
   'utils/fields/finders/stateFinder.js',
   'utils/fields/finders/resolutionCodeFinder.js',
   'utils/fields/finders/closeNotesFinder.js',
+  'utils/fields/finders/resolutionTabFinder.js',
   
   // Iframe utilities (order matters: validator -> shadowDom -> finder)
   'utils/dom/iframeValidator.js',
@@ -23,18 +24,17 @@ const REQUIRED_FILES = [
   'utils/dom/iframeFinder.js',
   
   // Field helpers (must load before files that use them)
-  'utils/fields/fieldSetter.js',
-  'utils/fields/gFormHelper.js',
-  'utils/fields/angularHelper.js',
-  'utils/fields/contentEditableHelper.js',
-  'utils/fields/resolutionTabFinder.js',
+  'utils/fields/helpers/fieldSetter.js',
+  'utils/fields/helpers/gFormHelper.js',
+  'utils/fields/helpers/angularHelper.js',
+  'utils/fields/helpers/contentEditableHelper.js',
   'utils/dom/scrollManager.js',
-  'utils/fields/timeFiller.js',
+  'utils/fields/fillers/timeFiller.js',
   
   // Work notes and type fillers (depend on helpers above)
-  'utils/fields/workNoteExtractor.js',
-  'utils/fields/workNotesFiller.js',
-  'utils/fields/workTypeFiller.js',
+  'utils/fields/core/workNoteExtractor.js',
+  'utils/fields/fillers/workNotesFiller.js',
+  'utils/fields/fillers/workTypeFiller.js',
   
   // Save button utilities
   'utils/actions/saveButtonFinder.js',
