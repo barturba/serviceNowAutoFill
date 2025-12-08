@@ -2,20 +2,6 @@
  * Script injection utilities for popup
  */
 
-const REQUIRED_FILES = [
-  'utils/parsers/timeParser.js',
-  'utils/fields/fieldFinder.js',
-  'utils/dom/iframeFinder.js',
-  'utils/dom/injectValidator.js',
-  'utils/actions/saveButtonHandler.js',
-  'utils/fields/workNoteExtractor.js',
-  'utils/fields/workNotesFiller.js',
-  'utils/fields/workTypeFiller.js',
-  'core/alertClearedProcessor.js',
-  'core/formFiller.js',
-  'content/inject.js'
-];
-
 /**
  * Inject scripts and execute a function
  * @param {string} funcName - Name of function to call (e.g., 'fillTimeInNestedFrame')
