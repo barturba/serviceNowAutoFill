@@ -11,7 +11,7 @@
       "*://*.service-now.com/*"
     ],
     "action": {
-      "default_popup": "popup.html"
+      "default_popup": "popup/popup.html"
     },
     "icons": {
       "16": "icon16.png",

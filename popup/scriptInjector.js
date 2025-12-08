@@ -3,17 +3,17 @@
  */
 
 const REQUIRED_FILES = [
-  'utils/timeParser.js',
-  'utils/fieldFinder.js',
-  'utils/iframeFinder.js',
-  'utils/injectValidator.js',
-  'utils/saveButtonHandler.js',
-  'utils/workNoteExtractor.js',
-  'utils/workNotesFiller.js',
-  'utils/workTypeFiller.js',
-  'utils/alertClearedProcessor.js',
-  'utils/formFiller.js',
-  'inject.js'
+  'utils/parsers/timeParser.js',
+  'utils/fields/fieldFinder.js',
+  'utils/dom/iframeFinder.js',
+  'utils/dom/injectValidator.js',
+  'utils/actions/saveButtonHandler.js',
+  'utils/fields/workNoteExtractor.js',
+  'utils/fields/workNotesFiller.js',
+  'utils/fields/workTypeFiller.js',
+  'core/alertClearedProcessor.js',
+  'core/formFiller.js',
+  'content/inject.js'
 ];
 
 /**

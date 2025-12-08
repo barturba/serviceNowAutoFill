@@ -36,10 +36,10 @@ fi
 
 zip -r "$BUILD_DIR/$ZIP_NAME" \
   manifest.json \
-  popup.html \
-  popup.js \
-  inject.js \
-  utils/*.js \
+  popup/ \
+  content/ \
+  core/ \
+  utils/ \
   $ICON_FILES \
   -x "*.git*" "build/*" "*.sh" "*.md" "*.DS_Store" "dev-tools/*" "docs/*"
 
