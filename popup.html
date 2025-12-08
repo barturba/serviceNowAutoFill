@@ -48,10 +48,36 @@
       background: #1e7e34;
       transform: scale(0.98);
     }
+    .comments-input-container {
+      margin-bottom: 10px;
+    }
+    .comments-input-container label {
+      display: block;
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+    .comments-input-container input {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 12px;
+      font-family: Arial;
+      box-sizing: border-box;
+    }
+    .comments-input-container input:focus {
+      outline: none;
+      border-color: #007bff;
+    }
   </style>
 </head>
 <body>
   <h3>Fill Time Entry</h3>
+  <div class="comments-input-container">
+    <label for="additional-comments-input">Additional Comments</label>
+    <input type="text" id="additional-comments-input" placeholder="Leave empty to use last comment">
+  </div>
   <div class="button-grid">
     <button class="time-btn" data-time="15 minutes">15 min</button>
     <button class="time-btn" data-time="30 minutes">30 min</button>

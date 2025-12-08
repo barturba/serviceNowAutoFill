@@ -8,11 +8,13 @@
 /**
  * Main function injected into page context to fill time entry form
  * @param {string} timeValue - Time duration string (e.g., "15 minutes")
+ * @param {string} [commentText] - Optional comment text to use instead of last work note
  * @returns {Promise<{success: boolean, error?: string}>}
  */
-async function fillTimeInNestedFrame(timeValue) {
+async function fillTimeInNestedFrame(timeValue, commentText) {
   console.log('Starting fillTimeInNestedFrame...');
   console.log('Current URL:', window.location.href);
+  console.log('Comment text provided:', commentText || '(will use last work note)');
 
   // Check that required functions are available (from injected modules)
   if (!window.FormFiller || !window.FormFiller.processIncidentForm) {
@@ -30,7 +32,7 @@ async function fillTimeInNestedFrame(timeValue) {
   const directWorkStart = document.querySelector('[id*="work_start"]');
   if (directTimeField || directWorkStart) {
     console.log('✓ Found incident form fields directly in current document (no iframe needed)');
-    return await window.FormFiller.processIncidentForm(document, timeValue);
+    return await window.FormFiller.processIncidentForm(document, timeValue, commentText);
   }
 
   console.log('Fields not in current document, searching for iframe...');
@@ -40,7 +42,7 @@ async function fillTimeInNestedFrame(timeValue) {
     console.log('✓ Found iframe:', iframe);
 
     const iframeDoc = await window.IframeFinder.waitForIframeLoad(iframe);
-    return await window.FormFiller.processIncidentForm(iframeDoc, timeValue);
+    return await window.FormFiller.processIncidentForm(iframeDoc, timeValue, commentText);
   } catch (error) {
     console.error('Error finding or accessing iframe:', error);
     return { success: false, error: error.message };
@@ -91,14 +93,16 @@ async function processAlertCleared() {
 /**
  * Main function injected into page context to fill time entry form and then click Save
  * @param {string} timeValue - Time duration string (e.g., "15 minutes")
+ * @param {string} [commentText] - Optional comment text to use instead of last work note
  * @returns {Promise<{success: boolean, error?: string}>}
  */
-async function fillTimeInNestedFrameAndSave(timeValue) {
+async function fillTimeInNestedFrameAndSave(timeValue, commentText) {
   console.log('Starting fillTimeInNestedFrameAndSave...');
   console.log('Current URL:', window.location.href);
+  console.log('Comment text provided:', commentText || '(will use last work note)');
 
   // First, fill the time entry form using the existing function
-  const fillResult = await fillTimeInNestedFrame(timeValue);
+  const fillResult = await fillTimeInNestedFrame(timeValue, commentText);
   
   if (!fillResult.success) {
     console.error('Failed to fill time entry:', fillResult.error);

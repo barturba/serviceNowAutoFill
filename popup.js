@@ -7,6 +7,9 @@
 document.querySelectorAll('.time-btn').forEach(button => {
   button.addEventListener('click', () => {
     const timeValue = button.getAttribute('data-time');
+    // Read comment text from input field
+    const commentInput = document.getElementById('additional-comments-input');
+    const commentText = commentInput ? commentInput.value.trim() : '';
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const tabId = tabs[0].id;
       
@@ -27,18 +30,18 @@ document.querySelectorAll('.time-btn').forEach(button => {
           return;
         }
 
-        // Now execute the function with the time value
+        // Now execute the function with the time value and comment text
         chrome.scripting.executeScript({
           target: { tabId },
-          func: (timeValue) => {
+          func: (timeValue, commentText) => {
             // Call the function that was injected
             if (window.fillTimeInNestedFrame) {
-              return window.fillTimeInNestedFrame(timeValue);
+              return window.fillTimeInNestedFrame(timeValue, commentText);
             } else {
               throw new Error('fillTimeInNestedFrame not found');
             }
           },
-          args: [timeValue]
+          args: [timeValue, commentText]
         }, (results) => {
           if (chrome.runtime.lastError) {
             console.error(chrome.runtime.lastError);
@@ -65,6 +68,9 @@ document.querySelectorAll('.time-btn').forEach(button => {
 document.querySelectorAll('.time-save-btn').forEach(button => {
   button.addEventListener('click', () => {
     const timeValue = button.getAttribute('data-time');
+    // Read comment text from input field
+    const commentInput = document.getElementById('additional-comments-input');
+    const commentText = commentInput ? commentInput.value.trim() : '';
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const tabId = tabs[0].id;
       
@@ -85,18 +91,18 @@ document.querySelectorAll('.time-save-btn').forEach(button => {
           return;
         }
 
-        // Now execute the function with the time value
+        // Now execute the function with the time value and comment text
         chrome.scripting.executeScript({
           target: { tabId },
-          func: (timeValue) => {
+          func: (timeValue, commentText) => {
             // Call the function that was injected
             if (window.fillTimeInNestedFrameAndSave) {
-              return window.fillTimeInNestedFrameAndSave(timeValue);
+              return window.fillTimeInNestedFrameAndSave(timeValue, commentText);
             } else {
               throw new Error('fillTimeInNestedFrameAndSave not found');
             }
           },
-          args: [timeValue]
+          args: [timeValue, commentText]
         }, (results) => {
           if (chrome.runtime.lastError) {
             console.error(chrome.runtime.lastError);

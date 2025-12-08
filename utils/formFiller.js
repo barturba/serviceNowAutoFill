@@ -298,12 +298,14 @@ function fillWorkType(doc, workTypeField) {
  * Process and fill ServiceNow incident form
  * @param {Document} doc - Document containing the form
  * @param {string} timeValue - Time duration string (e.g., "15 minutes")
+ * @param {string} [commentText] - Optional comment text to use instead of last work note
  * @returns {Promise<{success: boolean, error?: string}>} Result object
  */
-window.FormFiller.processIncidentForm = async function(doc, timeValue) {
+window.FormFiller.processIncidentForm = async function(doc, timeValue, commentText) {
   console.log('=== PROCESSING INCIDENT FORM ===');
   console.log('Document URL:', doc.location.href);
   console.log('Document readyState:', doc.readyState);
+  console.log('Comment text provided:', commentText || '(will use last work note)');
 
   try {
     const durationSeconds = window.TimeParser.parseDuration(timeValue);
@@ -350,8 +352,9 @@ window.FormFiller.processIncidentForm = async function(doc, timeValue) {
       console.warn('⚠ work_end field not found, skipping');
     }
 
-    // Fill work notes
-    const workNotesText = getLastWorkNote(doc);
+    // Fill work notes - use provided comment text if available, otherwise get last work note
+    const workNotesText = (commentText && commentText.trim()) ? commentText.trim() : getLastWorkNote(doc);
+    console.log('Using work notes text:', workNotesText);
     const workNotesFields = await fillWorkNotes(doc, workNotesField, workNotesEditable, workNotesText);
     fieldsToUpdate.push(...workNotesFields);
 
