@@ -10,7 +10,9 @@ async function findSaveButton() {
     try {
       saveButton = (iframe.contentDocument || iframe.contentWindow.document)?.querySelector('#sysverb_update_and_stay');
       if (saveButton) return saveButton;
-    } catch (e) {}
+    } catch (e) {
+      console.debug('Cannot access iframe content (cross-origin):', e.message);
+    }
   }
 
   if (window.IframeFinder) {
@@ -21,7 +23,9 @@ async function findSaveButton() {
         saveButton = iframeDoc.querySelector('#sysverb_update_and_stay');
         if (saveButton) return saveButton;
       }
-    } catch (e) {}
+    } catch (e) {
+      console.debug('IframeFinder failed to find save button:', e.message);
+    }
   }
 
   return null;

@@ -18,17 +18,16 @@ async function fillWorkNotes(doc, workNotesField, workNotesEditable, workNotesTe
 
   workNotesField.click();
   workNotesField.focus();
-  await new Promise(resolve => setTimeout(resolve, 100));
+  await new Promise(resolve => setTimeout(resolve, window.TimingConstants?.DELAY_FIELD_FOCUS || 100));
 
+  // Set field value directly (execCommand is deprecated, but preserve select() behavior for ServiceNow compatibility)
   if (!existingContent) {
     try {
       workNotesField.select();
-      document.execCommand('insertText', false, finalWorkNotesText);
     } catch (e) {
-      console.log('execCommand failed:', e.message);
+      // select() may fail on some field types, continue anyway
     }
   }
-
   workNotesField.value = existingContent || finalWorkNotesText;
   ['click', 'focus', 'keydown', 'keypress', 'input', 'keyup', 'change', 'blur'].forEach(type => {
     workNotesField.dispatchEvent(new Event(type, { bubbles: true, cancelable: true }));

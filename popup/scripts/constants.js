@@ -5,6 +5,7 @@
 const REQUIRED_FILES = [
   // Core parsers and utilities (must load first)
   'utils/parsers/timeParser.js',
+  'utils/constants.js',
   'utils/fields/core/fieldFinder.js',
   
   // Field finders (depend on fieldFinder.js)

@@ -25,7 +25,9 @@ function findResolutionTab(doc) {
       for (const elem of doc.querySelectorAll(selector)) {
         if (isResolutionTab(elem)) return elem;
       }
-    } catch (e) {}
+    } catch (e) {
+      console.debug('Error querying resolution tab selector:', selector, e.message);
+    }
   }
 
   for (const link of doc.querySelectorAll('a[role="tab"], button[role="tab"], a.nav-link, button.nav-link')) {
@@ -37,9 +39,9 @@ function findResolutionTab(doc) {
 async function clickResolutionTab(resolutionTab, doc, restoreScroll) {
   resolutionTab.click();
   restoreScroll();
-  await new Promise(resolve => setTimeout(resolve, 100));
+  await new Promise(resolve => setTimeout(resolve, window.TimingConstants?.DELAY_TAB_SWITCH_INITIAL || 100));
   restoreScroll();
-  await new Promise(resolve => setTimeout(resolve, 400));
+  await new Promise(resolve => setTimeout(resolve, window.TimingConstants?.DELAY_TAB_SWITCH_FINAL || 400));
   restoreScroll();
 }
 

@@ -13,7 +13,9 @@ window.IframeFinder.findInShadowRoots = function(root, iframeSelectors, depth = 
           return iframe;
         }
       }
-    } catch (e) {}
+    } catch (e) {
+      console.debug('Error querying selector in shadow DOM:', selector, e.message);
+    }
   }
 
   for (const element of root.querySelectorAll('*')) {
