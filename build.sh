@@ -31,7 +31,7 @@ if [ -f "icon16.png" ] && [ -f "icon48.png" ] && [ -f "icon128.png" ]; then
   ICON_FILES="icon16.png icon48.png icon128.png"
   echo "Including icon files..."
 else
-  echo "⚠ Warning: Icon files not found. Run generate-icons.html to create them."
+  echo "⚠ Warning: Icon files not found."
 fi
 
 zip -r "$BUILD_DIR/$ZIP_NAME" \

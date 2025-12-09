@@ -15,7 +15,7 @@ window.IframeFinder.findIframeInDOM = async function(timeout = 15000) {
   while (Date.now() - startTime < timeout) {
     const iframe = window.IframeFinder.findInShadowRoots(document, IFRAME_SELECTORS);
     if (iframe) return iframe;
-    await new Promise(resolve => setTimeout(resolve, window.TimingConstants?.DELAY_IFRAME_POLL || 500));
+    await new Promise(resolve => setTimeout(resolve, window.TimingConstants.DELAY_IFRAME_POLL));
   }
   throw new Error('Timeout: iframe not found after searching both regular and shadow DOM');
 };
