@@ -2,10 +2,37 @@
  * Storage utilities for popup
  */
 
+// Storage keys
 const STORAGE_KEY_TASKMASTER_AGENT = 'taskmasterAgent';
 const STORAGE_KEY_MACD_AGENTS_CACHE = 'macdAgentsCache';
 const STORAGE_KEY_MACD_AGENTS_CACHE_TIMESTAMP = 'macdAgentsCacheTimestamp';
 const CACHE_EXPIRY_HOURS = 24;
+
+/**
+ * Generic helper for chrome.storage.local.set
+ * @param {Object} data - Data to store
+ * @returns {Promise<void>}
+ */
+function setStorageData(data) {
+  return new Promise((resolve) => {
+    chrome.storage.local.set(data, () => resolve());
+  });
+}
+
+/**
+ * Generic helper for chrome.storage.local.get
+ * @param {string|string[]} keys - Key(s) to retrieve
+ * @returns {Promise<Object>} Retrieved data
+ */
+function getStorageData(keys) {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(keys, (result) => resolve(result));
+  });
+}
+
+// ============================================================================
+// Taskmaster Agent Storage
+// ============================================================================
 
 /**
  * Save taskmaster agent to chrome storage
@@ -13,24 +40,21 @@ const CACHE_EXPIRY_HOURS = 24;
  * @returns {Promise<void>}
  */
 function saveTaskmasterAgent(agentName) {
-  return new Promise((resolve) => {
-    chrome.storage.local.set({ [STORAGE_KEY_TASKMASTER_AGENT]: agentName }, () => {
-      resolve();
-    });
-  });
+  return setStorageData({ [STORAGE_KEY_TASKMASTER_AGENT]: agentName });
 }
 
 /**
  * Load taskmaster agent from chrome storage
  * @returns {Promise<string|null>} The saved agent name or null
  */
-function loadTaskmasterAgent() {
-  return new Promise((resolve) => {
-    chrome.storage.local.get([STORAGE_KEY_TASKMASTER_AGENT], (result) => {
-      resolve(result[STORAGE_KEY_TASKMASTER_AGENT] || null);
-    });
-  });
+async function loadTaskmasterAgent() {
+  const result = await getStorageData([STORAGE_KEY_TASKMASTER_AGENT]);
+  return result[STORAGE_KEY_TASKMASTER_AGENT] || null;
 }
+
+// ============================================================================
+// MACD Agents Cache Storage
+// ============================================================================
 
 /**
  * Save MACD agents cache with timestamp
@@ -38,14 +62,10 @@ function loadTaskmasterAgent() {
  * @returns {Promise<void>}
  */
 function saveMacdAgentsCache(agents) {
-  return new Promise((resolve) => {
-    const timestamp = Date.now();
-    chrome.storage.local.set({
-      [STORAGE_KEY_MACD_AGENTS_CACHE]: agents,
-      [STORAGE_KEY_MACD_AGENTS_CACHE_TIMESTAMP]: timestamp
-    }, () => {
-      resolve();
-    });
+  const timestamp = Date.now();
+  return setStorageData({
+    [STORAGE_KEY_MACD_AGENTS_CACHE]: agents,
+    [STORAGE_KEY_MACD_AGENTS_CACHE_TIMESTAMP]: timestamp
   });
 }
 
@@ -53,19 +73,19 @@ function saveMacdAgentsCache(agents) {
  * Load MACD agents cache
  * @returns {Promise<{agents: string[], timestamp: number}|null>} Cached agents and timestamp, or null if not cached
  */
-function loadMacdAgentsCache() {
-  return new Promise((resolve) => {
-    chrome.storage.local.get([STORAGE_KEY_MACD_AGENTS_CACHE, STORAGE_KEY_MACD_AGENTS_CACHE_TIMESTAMP], (result) => {
-      if (result[STORAGE_KEY_MACD_AGENTS_CACHE] && result[STORAGE_KEY_MACD_AGENTS_CACHE_TIMESTAMP]) {
-        resolve({
-          agents: result[STORAGE_KEY_MACD_AGENTS_CACHE],
-          timestamp: result[STORAGE_KEY_MACD_AGENTS_CACHE_TIMESTAMP]
-        });
-      } else {
-        resolve(null);
-      }
-    });
-  });
+async function loadMacdAgentsCache() {
+  const result = await getStorageData([
+    STORAGE_KEY_MACD_AGENTS_CACHE,
+    STORAGE_KEY_MACD_AGENTS_CACHE_TIMESTAMP
+  ]);
+  
+  if (result[STORAGE_KEY_MACD_AGENTS_CACHE] && result[STORAGE_KEY_MACD_AGENTS_CACHE_TIMESTAMP]) {
+    return {
+      agents: result[STORAGE_KEY_MACD_AGENTS_CACHE],
+      timestamp: result[STORAGE_KEY_MACD_AGENTS_CACHE_TIMESTAMP]
+    };
+  }
+  return null;
 }
 
 /**
@@ -78,6 +98,10 @@ function isMacdAgentsCacheExpired(timestamp) {
   const expiryMs = CACHE_EXPIRY_HOURS * 60 * 60 * 1000;
   return (now - timestamp) > expiryMs;
 }
+
+// ============================================================================
+// Agent Management Helpers
+// ============================================================================
 
 /**
  * Get all agents from storage
@@ -113,4 +137,3 @@ async function removeAgentFromStorage(name) {
   const filteredAgents = agents.filter(agent => agent.toLowerCase() !== name.toLowerCase());
   await saveMacdAgentsCache(filteredAgents);
 }
-

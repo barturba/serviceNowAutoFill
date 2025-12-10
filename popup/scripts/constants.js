@@ -52,6 +52,9 @@ const REQUIRED_FILES = [
   // Core processors
   'core/formFiller.js',
   'core/alertClearedProcessor.js',
+  // MACD Assignment Processor modules
+  'core/macdAssignmentProcessor/fieldSetters.js',
+  'core/macdAssignmentProcessor/steps.js',
   'core/macdAssignmentProcessor.js',
   
   // Entry point (must load last)

@@ -2,6 +2,11 @@
  * Resolution tab finding utilities
  */
 
+/**
+ * Check if element is a resolution tab
+ * @param {HTMLElement} elem - Element to check
+ * @returns {boolean} True if element is a resolution tab
+ */
 function isResolutionTab(elem) {
   const text = (elem.textContent || elem.innerText || '').trim().toLowerCase();
   const ariaLabel = (elem.getAttribute('aria-label') || '').toLowerCase();
@@ -11,7 +16,12 @@ function isResolutionTab(elem) {
          text.length > 2;
 }
 
-function findResolutionTab(doc) {
+/**
+ * Search for resolution tab using specific selectors
+ * @param {Document} doc - Document to search
+ * @returns {HTMLElement|null} Resolution tab element or null
+ */
+function searchWithSelectors(doc) {
   const selectors = [
     'a[aria-label*="Resolution"][role="tab"]',
     'a[aria-label*="Resolution"]:not([class*="info"]):not([class*="icon"])',
@@ -29,13 +39,37 @@ function findResolutionTab(doc) {
       console.debug('Error querying resolution tab selector:', selector, e.message);
     }
   }
+  return null;
+}
 
+/**
+ * Search for resolution tab in all tab elements
+ * @param {Document} doc - Document to search
+ * @returns {HTMLElement|null} Resolution tab element or null
+ */
+function searchInAllTabs(doc) {
   for (const link of doc.querySelectorAll('a[role="tab"], button[role="tab"], a.nav-link, button.nav-link')) {
     if (isResolutionTab(link)) return link;
   }
   return null;
 }
 
+/**
+ * Find resolution tab in document
+ * @param {Document} doc - Document to search
+ * @returns {HTMLElement|null} Resolution tab element or null
+ */
+function findResolutionTab(doc) {
+  return searchWithSelectors(doc) || searchInAllTabs(doc);
+}
+
+/**
+ * Click resolution tab and wait for it to load
+ * @param {HTMLElement} resolutionTab - Resolution tab element
+ * @param {Document} doc - Document containing the tab
+ * @param {Function} restoreScroll - Function to restore scroll position
+ * @returns {Promise<void>}
+ */
 async function clickResolutionTab(resolutionTab, doc, restoreScroll) {
   resolutionTab.click();
   restoreScroll();
@@ -48,4 +82,3 @@ async function clickResolutionTab(resolutionTab, doc, restoreScroll) {
 // Make available globally
 window.findResolutionTab = findResolutionTab;
 window.clickResolutionTab = clickResolutionTab;
-

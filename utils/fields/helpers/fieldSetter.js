@@ -2,8 +2,24 @@
  * Field setting utilities for alert cleared workflow
  */
 
+/**
+ * Get g_form API from document
+ * @param {Document} doc - Document containing the form
+ * @returns {Object|null} g_form API object or null
+ */
+function getGForm(doc) {
+  return doc.defaultView?.g_form || null;
+}
+
+/**
+ * Set field value using g_form API or direct manipulation
+ * @param {Document} doc - Document containing the form
+ * @param {HTMLElement} field - Field element
+ * @param {string} fieldName - Field name for g_form API
+ * @param {string} value - Value to set
+ */
 function setFieldValue(doc, field, fieldName, value) {
-  const gForm = doc.defaultView?.g_form;
+  const gForm = getGForm(doc);
   if (gForm) {
     try {
       gForm.setValue(fieldName, value);
@@ -15,6 +31,14 @@ function setFieldValue(doc, field, fieldName, value) {
   }
 }
 
+/**
+ * Set select field value by matching option
+ * @param {Document} doc - Document containing the form
+ * @param {HTMLElement} field - Select field element
+ * @param {string} fieldName - Field name for g_form API
+ * @param {Function} optionMatcher - Function to match option
+ * @param {string} fallbackValue - Fallback value if no match
+ */
 function setSelectFieldValue(doc, field, fieldName, optionMatcher, fallbackValue) {
   if (field.tagName === 'SELECT') {
     const matchedOption = Array.from(field.options).find(optionMatcher);
@@ -24,8 +48,54 @@ function setSelectFieldValue(doc, field, fieldName, optionMatcher, fallbackValue
   }
 }
 
+/**
+ * Dispatch events on a field element
+ * @param {HTMLElement} field - Field element
+ * @param {string[]} eventTypes - Array of event types to dispatch
+ */
 function dispatchFieldEvents(field, eventTypes = ['input', 'change']) {
   eventTypes.forEach(type => field.dispatchEvent(new Event(type, { bubbles: true })));
+}
+
+/**
+ * Clear field value and dispatch events
+ * @param {HTMLElement} field - Field element
+ * @returns {Promise<void>}
+ */
+async function clearFieldValue(field) {
+  field.value = '';
+  field.dispatchEvent(new Event('input', { bubbles: true }));
+  await new Promise(resolve => setTimeout(resolve, 100));
+}
+
+/**
+ * Set field value using g_form API with fallback
+ * @param {Document} doc - Document containing the form
+ * @param {HTMLElement} field - Field element
+ * @param {string} fieldName - Field name for g_form API
+ * @param {string} value - Value to set
+ * @returns {Promise<void>}
+ */
+async function setFieldValueWithGForm(doc, field, fieldName, value) {
+  const gForm = getGForm(doc);
+  if (gForm) {
+    try {
+      gForm.setValue(fieldName, '');
+      await new Promise(resolve => setTimeout(resolve, 100));
+      gForm.setValue(fieldName, value);
+      console.log(`✓ Set ${fieldName} to "${value}" using g_form.setValue()`);
+      dispatchFieldEvents(field, ['input', 'change', 'blur']);
+    } catch (e) {
+      console.log(`g_form.setValue failed, using direct field manipulation: ${e.message}`);
+      await clearFieldValue(field);
+      field.value = value;
+      dispatchFieldEvents(field, ['input', 'change', 'blur']);
+    }
+  } else {
+    await clearFieldValue(field);
+    field.value = value;
+    dispatchFieldEvents(field, ['input', 'change', 'blur']);
+  }
 }
 
 /**
@@ -44,44 +114,8 @@ async function setReferenceFieldValue(doc, field, fieldName, value) {
   field.focus();
   field.dispatchEvent(new Event('focus', { bubbles: true }));
   
-  // Clear the field first to ensure clean state, then set new value
-  const gForm = doc.defaultView?.g_form;
-  if (gForm) {
-    try {
-      // Clear the field first
-      gForm.setValue(fieldName, '');
-      // Small delay to allow ServiceNow to process the clear
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // Set the new value
-      gForm.setValue(fieldName, value);
-      console.log(`✓ Set ${fieldName} to "${value}" using g_form.setValue()`);
-      
-      // Trigger events on the field element
-      field.dispatchEvent(new Event('input', { bubbles: true }));
-      field.dispatchEvent(new Event('change', { bubbles: true }));
-      field.dispatchEvent(new Event('blur', { bubbles: true }));
-    } catch (e) {
-      console.log(`g_form.setValue failed, using direct field manipulation: ${e.message}`);
-      // Fallback to direct value setting
-      field.value = '';
-      field.dispatchEvent(new Event('input', { bubbles: true }));
-      await new Promise(resolve => setTimeout(resolve, 100));
-      field.value = value;
-      field.dispatchEvent(new Event('input', { bubbles: true }));
-      field.dispatchEvent(new Event('change', { bubbles: true }));
-      field.dispatchEvent(new Event('blur', { bubbles: true }));
-    }
-  } else {
-    // No g_form API, use direct manipulation
-    field.value = '';
-    field.dispatchEvent(new Event('input', { bubbles: true }));
-    await new Promise(resolve => setTimeout(resolve, 100));
-    field.value = value;
-    field.dispatchEvent(new Event('input', { bubbles: true }));
-    field.dispatchEvent(new Event('change', { bubbles: true }));
-    field.dispatchEvent(new Event('blur', { bubbles: true }));
-  }
+  // Set value using g_form API or direct manipulation
+  await setFieldValueWithGForm(doc, field, fieldName, value);
 }
 
 // Make available globally
@@ -89,4 +123,3 @@ window.setFieldValue = setFieldValue;
 window.setSelectFieldValue = setSelectFieldValue;
 window.dispatchFieldEvents = dispatchFieldEvents;
 window.setReferenceFieldValue = setReferenceFieldValue;
-

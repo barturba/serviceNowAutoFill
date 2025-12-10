@@ -4,6 +4,34 @@
  */
 
 /**
+ * Validate tab and URL for ServiceNow page
+ * @param {Object} tab - Chrome tab object
+ * @returns {boolean} True if valid ServiceNow tab
+ */
+function isValidServiceNowTab(tab) {
+  return tab && tab.url && tab.url.includes('service-now.com');
+}
+
+/**
+ * Handle script execution results
+ * @param {Array} results - Execution results
+ * @param {Function} resolve - Promise resolve function
+ * @param {Function} reject - Promise reject function
+ */
+function handleExecutionResults(results, resolve, reject) {
+  if (results && results[0] && results[0].result) {
+    const members = results[0].result;
+    if (Array.isArray(members) && members.length > 0) {
+      resolve(members);
+    } else {
+      reject(new Error('No MACD members found'));
+    }
+  } else {
+    reject(new Error('Failed to fetch MACD members'));
+  }
+}
+
+/**
  * Fetch MACD members from ServiceNow page
  * @returns {Promise<string[]>} Array of member display names
  */
@@ -15,35 +43,21 @@ async function fetchMacdMembersFromServiceNow() {
         return;
       }
 
-      const tabId = tabs[0].id;
-      const tabUrl = tabs[0].url;
-
-      // Check if we're on a ServiceNow page
-      if (!tabUrl || !tabUrl.includes('service-now.com')) {
+      const tab = tabs[0];
+      if (!isValidServiceNowTab(tab)) {
         reject(new Error('Not on a ServiceNow page'));
         return;
       }
 
-      // Inject script to fetch members from page context
       chrome.scripting.executeScript({
-        target: { tabId },
+        target: { tabId: tab.id },
         func: fetchMacdMembersInPageContext
       }, (results) => {
         if (chrome.runtime.lastError) {
           reject(new Error(chrome.runtime.lastError.message));
           return;
         }
-
-        if (results && results[0] && results[0].result) {
-          const members = results[0].result;
-          if (Array.isArray(members) && members.length > 0) {
-            resolve(members);
-          } else {
-            reject(new Error('No MACD members found'));
-          }
-        } else {
-          reject(new Error('Failed to fetch MACD members'));
-        }
+        handleExecutionResults(results, resolve, reject);
       });
     });
   });
@@ -104,5 +118,3 @@ function fetchMacdMembersInPageContext() {
     return [];
   }
 }
-
-
