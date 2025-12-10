@@ -75,4 +75,23 @@ button:active {
   background: #004085;
   transform: scale(0.98);
 }
+.refresh-btn {
+  color: #666;
+  font-size: 16px;
+  line-height: 1;
+  padding: 4px 6px;
+  min-width: auto;
+  width: auto;
+  height: auto;
+  background: transparent;
+}
+.refresh-btn:hover {
+  color: #007bff;
+  background: rgba(0, 123, 255, 0.1);
+  border-radius: 3px;
+}
+.refresh-btn:active {
+  transform: rotate(180deg);
+  transition: transform 0.3s;
+}
 
