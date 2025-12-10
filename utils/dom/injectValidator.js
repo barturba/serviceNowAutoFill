@@ -24,6 +24,11 @@ function validateAlertCleared() {
   validateIframeFinder();
 }
 
+function validateMacdAssignment() {
+  validateFormFiller('processMacdAssignment');
+  validateIframeFinder();
+}
+
 function isDirectDocument() {
   return !!(document.querySelector('[id*="time_worked"]') || document.querySelector('[id*="work_start"]'));
 }
@@ -42,5 +47,6 @@ async function resolveDocument() {
 // Make functions available globally
 window.validateFormProcessing = validateFormProcessing;
 window.validateAlertCleared = validateAlertCleared;
+window.validateMacdAssignment = validateMacdAssignment;
 window.resolveDocument = resolveDocument;
 

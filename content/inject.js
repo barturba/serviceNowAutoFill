@@ -33,6 +33,18 @@ async function fillTimeInNestedFrameAndSave(timeValue, commentText) {
   return await clickSaveButton();
 }
 
+async function processMacdAssignment(agentName) {
+  console.log('Starting processMacdAssignment...', window.location.href);
+  validateMacdAssignment();
+  try {
+    const doc = await resolveDocument();
+    return await window.FormFiller.processMacdAssignment(doc, agentName);
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
 window.fillTimeInNestedFrame = fillTimeInNestedFrame;
 window.processAlertCleared = processAlertCleared;
 window.fillTimeInNestedFrameAndSave = fillTimeInNestedFrameAndSave;
+window.processMacdAssignment = processMacdAssignment;

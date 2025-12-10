@@ -27,3 +27,22 @@ function setupAlertClearedButtonHandler(button) {
   });
 }
 
+function setupMacdAssignmentButtonHandler(button) {
+  button.addEventListener('click', async () => {
+    const agentInput = document.getElementById('taskmaster-agent-input');
+    const agentName = agentInput ? agentInput.value.trim() : '';
+    
+    if (!agentName) {
+      showError('Please select or enter a taskmaster agent');
+      return;
+    }
+
+    // Save the agent selection
+    await saveTaskmasterAgent(agentName);
+
+    injectAndExecute('processMacdAssignment',
+      (agentName) => window.processMacdAssignment?.(agentName) || Promise.reject(new Error('processMacdAssignment not found')),
+      [agentName]);
+  });
+}
+

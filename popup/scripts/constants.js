@@ -18,6 +18,10 @@ const REQUIRED_FILES = [
   'utils/fields/finders/resolutionCodeFinder.js',
   'utils/fields/finders/closeNotesFinder.js',
   'utils/fields/finders/resolutionTabFinder.js',
+  'utils/fields/finders/categoryFinder.js',
+  'utils/fields/finders/subcategoryFinder.js',
+  'utils/fields/finders/assignmentGroupFinder.js',
+  'utils/fields/finders/assignedToFinder.js',
   
   // Iframe utilities (order matters: validator -> shadowDom -> finder)
   'utils/dom/iframeValidator.js',
@@ -48,6 +52,7 @@ const REQUIRED_FILES = [
   // Core processors
   'core/formFiller.js',
   'core/alertClearedProcessor.js',
+  'core/macdAssignmentProcessor.js',
   
   // Entry point (must load last)
   'content/inject.js'

@@ -10,6 +10,7 @@ const DELAY_TAB_SWITCH_INITIAL = 100;
 const DELAY_TAB_SWITCH_FINAL = 400;
 const DELAY_IFRAME_POLL = 500;
 const DELAY_ALERT_CLEARED = 100;
+const DELAY_ASSIGNMENT_GROUP_PROCESS = 800;
 
 // Make available globally for injected scripts
 window.TimingConstants = window.TimingConstants || {
@@ -19,6 +20,7 @@ window.TimingConstants = window.TimingConstants || {
   DELAY_TAB_SWITCH_INITIAL,
   DELAY_TAB_SWITCH_FINAL,
   DELAY_IFRAME_POLL,
-  DELAY_ALERT_CLEARED
+  DELAY_ALERT_CLEARED,
+  DELAY_ASSIGNMENT_GROUP_PROCESS
 };
 

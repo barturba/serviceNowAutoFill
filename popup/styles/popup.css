@@ -65,4 +65,14 @@ button:active {
   outline: none;
   border-color: #007bff;
 }
+.macd-assignment-btn {
+  background: #007bff;
+}
+.macd-assignment-btn:hover {
+  background: #0056b3;
+}
+.macd-assignment-btn:active {
+  background: #004085;
+  transform: scale(0.98);
+}
 
