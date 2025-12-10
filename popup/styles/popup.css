@@ -94,4 +94,21 @@ button:active {
   transform: rotate(180deg);
   transition: transform 0.3s;
 }
+.small-btn {
+  padding: 4px 8px;
+  font-size: 11px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.small-btn:hover {
+  background: #0056b3;
+}
+.small-btn:active {
+  background: #004085;
+  transform: scale(0.98);
+}
 

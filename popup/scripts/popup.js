@@ -71,6 +71,52 @@ async function loadMacdAgents() {
       await loadMacdAgents(); // Reload from cache
     });
   }
+
+  // Setup manage agents button - toggle management UI
+  const manageAgentsBtn = document.getElementById('manage-agents-btn');
+  if (manageAgentsBtn) {
+    manageAgentsBtn.addEventListener('mouseenter', () => {
+      manageAgentsBtn.style.background = '#5a6268';
+    });
+    manageAgentsBtn.addEventListener('mouseleave', () => {
+      manageAgentsBtn.style.background = '#6c757d';
+    });
+    manageAgentsBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleManagementUI();
+    });
+  }
+
+  // Setup add agent button
+  const addAgentBtn = document.getElementById('add-agent-btn');
+  const newAgentInput = document.getElementById('new-agent-input');
+  if (addAgentBtn && newAgentInput) {
+    addAgentBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const agentName = newAgentInput.value.trim();
+      if (agentName) {
+        const success = await addAgent(agentName);
+        if (success) {
+          newAgentInput.value = ''; // Clear input on success
+        }
+      }
+    });
+
+    // Allow Enter key to add agent
+    newAgentInput.addEventListener('keydown', async (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const agentName = newAgentInput.value.trim();
+        if (agentName) {
+          const success = await addAgent(agentName);
+          if (success) {
+            newAgentInput.value = ''; // Clear input on success
+          }
+        }
+      }
+    });
+  }
 })();
 
 // Setup time buttons (blue buttons)

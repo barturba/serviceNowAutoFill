@@ -36,13 +36,11 @@
     <h3 style="font-size: 12px; color: #666; margin: 0 0 8px 0;">MACD Assignment</h3>
     <div class="comments-input-container">
       <label for="taskmaster-agent-input">Taskmaster Agent</label>
-      <div style="position: relative; display: inline-block; width: 100%;">
-        <input type="text" id="taskmaster-agent-input" list="agent-list" placeholder="Select or type agent name" style="padding-right: 30px;">
-        <button id="manage-agents-btn" class="refresh-btn" title="Manage agents" style="position: absolute; right: 4px; top: 50%; transform: translateY(-50%); background: transparent; border: none; cursor: pointer; padding: 4px; font-size: 14px; color: #666;">⚙</button>
-      </div>
+      <input type="text" id="taskmaster-agent-input" list="agent-list" placeholder="Select or type agent name">
       <datalist id="agent-list">
         <!-- Populated dynamically -->
       </datalist>
+      <button id="manage-agents-btn" style="width: 100%; margin-top: 6px; padding: 4px 8px; font-size: 11px; background: #6c757d; color: white; border: none; border-radius: 3px; cursor: pointer; transition: background 0.2s;">Manage Agents</button>
     </div>
     <button class="macd-assignment-btn" style="width: 100%; margin-top: 8px;">Assign to MACD</button>
     
