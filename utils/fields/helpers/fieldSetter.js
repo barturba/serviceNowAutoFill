@@ -34,35 +34,54 @@ function dispatchFieldEvents(field, eventTypes = ['input', 'change']) {
  * @param {HTMLElement} field - The field element
  * @param {string} fieldName - The field name for g_form API
  * @param {string} value - The display value to set
+ * @returns {Promise<void>}
  */
-function setReferenceFieldValue(doc, field, fieldName, value) {
+async function setReferenceFieldValue(doc, field, fieldName, value) {
   console.log(`Setting reference field ${fieldName} to: ${value}`);
+  console.log(`Field details: id=${field.id}, type=${field.type}, current value="${field.value}"`);
   
   // Focus the field first
   field.focus();
   field.dispatchEvent(new Event('focus', { bubbles: true }));
   
-  // Set the value using g_form API if available
+  // Clear the field first to ensure clean state, then set new value
   const gForm = doc.defaultView?.g_form;
   if (gForm) {
     try {
+      // Clear the field first
+      gForm.setValue(fieldName, '');
+      // Small delay to allow ServiceNow to process the clear
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Set the new value
       gForm.setValue(fieldName, value);
-      console.log(`✓ Set ${fieldName} using g_form.setValue()`);
+      console.log(`✓ Set ${fieldName} to "${value}" using g_form.setValue()`);
+      
+      // Trigger events on the field element
+      field.dispatchEvent(new Event('input', { bubbles: true }));
+      field.dispatchEvent(new Event('change', { bubbles: true }));
+      field.dispatchEvent(new Event('blur', { bubbles: true }));
     } catch (e) {
       console.log(`g_form.setValue failed, using direct field manipulation: ${e.message}`);
       // Fallback to direct value setting
+      field.value = '';
+      field.dispatchEvent(new Event('input', { bubbles: true }));
+      await new Promise(resolve => setTimeout(resolve, 100));
       field.value = value;
       field.dispatchEvent(new Event('input', { bubbles: true }));
+      field.dispatchEvent(new Event('change', { bubbles: true }));
+      field.dispatchEvent(new Event('blur', { bubbles: true }));
     }
   } else {
     // No g_form API, use direct manipulation
+    field.value = '';
+    field.dispatchEvent(new Event('input', { bubbles: true }));
+    await new Promise(resolve => setTimeout(resolve, 100));
     field.value = value;
     field.dispatchEvent(new Event('input', { bubbles: true }));
+    field.dispatchEvent(new Event('change', { bubbles: true }));
+    field.dispatchEvent(new Event('blur', { bubbles: true }));
   }
-  
-  // Dispatch change and blur events to trigger ServiceNow's client-side logic
-  field.dispatchEvent(new Event('change', { bubbles: true }));
-  field.dispatchEvent(new Event('blur', { bubbles: true }));
 }
 
 // Make available globally
