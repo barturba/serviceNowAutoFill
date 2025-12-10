@@ -56,7 +56,7 @@ async function processMacdAssignment(doc, agentName) {
     }
 
     // Step 5: Find and set Assigned To field (after Assignment Group has been processed)
-    console.log('Step 4: Setting Assigned To field...');
+    console.log('Step 5: Setting Assigned To field...');
     const assignedToField = await window.FieldFinder.findAssignedToField(doc);
     if (assignedToField && agentName) {
       // Use the reference field helper for proper handling
