@@ -2,8 +2,24 @@
 
 # Build script for ServiceNow Time Entry Assistant Chrome Extension
 # Creates a zip file ready for Chrome Web Store upload
+# Usage: ./build.sh [--upload] [--publish]
 
 set -e  # Exit on error
+
+# Parse arguments
+UPLOAD=false
+PUBLISH=false
+for arg in "$@"; do
+  case $arg in
+    --upload)
+      UPLOAD=true
+      ;;
+    --publish)
+      PUBLISH=true
+      UPLOAD=true  # Publishing requires upload
+      ;;
+  esac
+done
 
 # Get version from manifest.json
 VERSION=$(grep -o '"version": "[^"]*' manifest.json | cut -d'"' -f4)
@@ -50,4 +66,88 @@ echo ""
 echo "Contents:"
 unzip -l "$BUILD_DIR/$ZIP_NAME"
 echo ""
-echo "Ready to upload to Chrome Web Store!"
+
+# Upload to Chrome Web Store if --upload flag is set
+if [ "$UPLOAD" = true ]; then
+  echo ""
+  echo "=========================================="
+  echo "Uploading to Chrome Web Store..."
+  echo "=========================================="
+  
+  # Check if op CLI is available
+  if ! command -v op &> /dev/null; then
+    echo "✗ Error: 1Password CLI (op) not found. Please install it first."
+    exit 1
+  fi
+  
+  # Load credentials from 1Password
+  echo "Loading credentials from 1Password..."
+  EXTENSION_ID=$(op read "op://AppSecrets/Chrome Web Store - ServiceNow AutoFill/extension_id")
+  CLIENT_ID=$(op read "op://AppSecrets/Chrome Web Store - ServiceNow AutoFill/client_id")
+  CLIENT_SECRET=$(op read "op://AppSecrets/Chrome Web Store - ServiceNow AutoFill/client_secret")
+  REFRESH_TOKEN=$(op read "op://AppSecrets/Chrome Web Store - ServiceNow AutoFill/refresh_token")
+  
+  # Get access token
+  echo "Getting access token..."
+  TOKEN_RESPONSE=$(curl -s "https://oauth2.googleapis.com/token" \
+    -d "client_id=${CLIENT_ID}" \
+    -d "client_secret=${CLIENT_SECRET}" \
+    -d "refresh_token=${REFRESH_TOKEN}" \
+    -d "grant_type=refresh_token")
+  
+  ACCESS_TOKEN=$(echo "$TOKEN_RESPONSE" | jq -r '.access_token')
+  
+  if [ "$ACCESS_TOKEN" = "null" ] || [ -z "$ACCESS_TOKEN" ]; then
+    echo "✗ Error: Failed to get access token"
+    echo "$TOKEN_RESPONSE" | jq .
+    exit 1
+  fi
+  
+  echo "✓ Access token obtained"
+  
+  # Upload to Chrome Web Store
+  echo "Uploading ${ZIP_NAME} to Chrome Web Store..."
+  UPLOAD_RESPONSE=$(curl -s -X PUT \
+    -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+    -H "x-goog-api-version: 2" \
+    -T "$BUILD_DIR/$ZIP_NAME" \
+    "https://www.googleapis.com/upload/chromewebstore/v1.1/items/${EXTENSION_ID}")
+  
+  UPLOAD_STATE=$(echo "$UPLOAD_RESPONSE" | jq -r '.uploadState')
+  
+  if [ "$UPLOAD_STATE" = "SUCCESS" ]; then
+    echo "✓ Upload successful!"
+  else
+    echo "✗ Upload failed:"
+    echo "$UPLOAD_RESPONSE" | jq .
+    exit 1
+  fi
+  
+  # Publish if --publish flag is set
+  if [ "$PUBLISH" = true ]; then
+    echo ""
+    echo "Publishing extension..."
+    PUBLISH_RESPONSE=$(curl -s -X POST \
+      -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+      -H "x-goog-api-version: 2" \
+      -H "Content-Length: 0" \
+      "https://www.googleapis.com/chromewebstore/v1.1/items/${EXTENSION_ID}/publish")
+    
+    PUBLISH_STATUS=$(echo "$PUBLISH_RESPONSE" | jq -r '.status[0]')
+    
+    if [ "$PUBLISH_STATUS" = "OK" ]; then
+      echo "✓ Extension published successfully!"
+    else
+      echo "Publish response:"
+      echo "$PUBLISH_RESPONSE" | jq .
+    fi
+  fi
+  
+  echo ""
+  echo "=========================================="
+  echo "✓ Chrome Web Store upload complete!"
+  echo "=========================================="
+else
+  echo "Ready to upload to Chrome Web Store!"
+  echo "Use --upload to upload, --publish to upload and publish"
+fi
