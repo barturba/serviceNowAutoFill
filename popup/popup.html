@@ -8,61 +8,62 @@
   <h3>Fill Time Entry</h3>
   <div class="comments-input-container">
     <label for="additional-comments-input">Additional Comments</label>
-    <input type="text" id="additional-comments-input" placeholder="Leave empty to use last comment">
+    <input type="text" id="additional-comments-input" placeholder="Leave empty to use last comment" aria-label="Additional comments for time entry">
   </div>
   <div class="button-grid">
-    <button class="time-btn" data-time="15 minutes">15 min</button>
-    <button class="time-btn" data-time="30 minutes">30 min</button>
-    <button class="time-btn" data-time="45 minutes">45 min</button>
-    <button class="time-btn" data-time="1 hour">1 hour</button>
-    <button class="time-btn" data-time="1 hour 30 minutes">1.5 hours</button>
-    <button class="time-btn" data-time="2 hours">2 hours</button>
+    <button class="time-btn" data-time="15 minutes" aria-label="Fill 15 minutes">15 min</button>
+    <button class="time-btn" data-time="30 minutes" aria-label="Fill 30 minutes">30 min</button>
+    <button class="time-btn" data-time="45 minutes" aria-label="Fill 45 minutes">45 min</button>
+    <button class="time-btn" data-time="1 hour" aria-label="Fill 1 hour">1 hour</button>
+    <button class="time-btn" data-time="1 hour 30 minutes" aria-label="Fill 1.5 hours">1.5 hours</button>
+    <button class="time-btn" data-time="2 hours" aria-label="Fill 2 hours">2 hours</button>
   </div>
-  <div style="margin-top: 10px; border-top: 1px solid #ddd; padding-top: 10px;">
-    <h3 style="font-size: 12px; color: #666; margin: 0 0 8px 0;">Fill Time & Save</h3>
+  <div class="section-divider">
+    <h3 class="section-subtitle">Fill Time & Save</h3>
     <div class="button-grid">
-      <button class="time-save-btn" data-time="15 minutes">15 min</button>
-      <button class="time-save-btn" data-time="30 minutes">30 min</button>
-      <button class="time-save-btn" data-time="45 minutes">45 min</button>
-      <button class="time-save-btn" data-time="1 hour">1 hour</button>
-      <button class="time-save-btn" data-time="1 hour 30 minutes">1.5 hours</button>
-      <button class="time-save-btn" data-time="2 hours">2 hours</button>
+      <button class="time-save-btn" data-time="15 minutes" aria-label="Fill 15 minutes and save">15 min</button>
+      <button class="time-save-btn" data-time="30 minutes" aria-label="Fill 30 minutes and save">30 min</button>
+      <button class="time-save-btn" data-time="45 minutes" aria-label="Fill 45 minutes and save">45 min</button>
+      <button class="time-save-btn" data-time="1 hour" aria-label="Fill 1 hour and save">1 hour</button>
+      <button class="time-save-btn" data-time="1 hour 30 minutes" aria-label="Fill 1.5 hours and save">1.5 hours</button>
+      <button class="time-save-btn" data-time="2 hours" aria-label="Fill 2 hours and save">2 hours</button>
     </div>
   </div>
-  <div style="margin-top: 10px; border-top: 1px solid #ddd; padding-top: 10px;">
-    <button class="alert-cleared-btn" style="width: 100%; background: #28a745;">Alert Cleared</button>
+  <div class="section-divider">
+    <button class="alert-cleared-btn full-width-btn" aria-label="Process alert cleared workflow">Alert Cleared</button>
   </div>
-  <div style="margin-top: 10px; border-top: 1px solid #ddd; padding-top: 10px;">
-    <h3 style="font-size: 12px; color: #666; margin: 0 0 8px 0;">MACD Assignment</h3>
+  <div class="section-divider">
+    <h3 class="section-subtitle">MACD Assignment</h3>
     <div class="comments-input-container">
       <label for="taskmaster-agent-input">Taskmaster Agent</label>
-      <input type="text" id="taskmaster-agent-input" list="agent-list" placeholder="Select or type agent name">
+      <input type="text" id="taskmaster-agent-input" list="agent-list" placeholder="Select or type agent name" aria-label="Taskmaster agent name">
       <datalist id="agent-list">
         <!-- Populated dynamically -->
       </datalist>
-      <button id="manage-agents-btn" style="width: 100%; margin-top: 6px; padding: 4px 8px; font-size: 11px; background: #6c757d; color: white; border: none; border-radius: 3px; cursor: pointer; transition: background 0.2s;">Manage Agents</button>
+      <button id="manage-agents-btn" class="manage-agents-btn" aria-label="Manage agents list">Manage Agents</button>
     </div>
-    <button class="macd-assignment-btn" style="width: 100%; margin-top: 8px;">Assign to MACD</button>
+    <button class="macd-assignment-btn full-width-btn" aria-label="Assign to MACD">Assign to MACD</button>
     
     <!-- Agent Management Section -->
-    <div id="agent-management" style="display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid #ddd;">
-      <h4 style="font-size: 11px; color: #666; margin: 0 0 8px 0;">Manage Agents</h4>
+    <div id="agent-management" class="agent-management-section">
+      <h4 class="agent-management-title">Manage Agents</h4>
       
       <!-- Add New Agent -->
-      <div style="margin-bottom: 10px;">
-        <div style="display: flex; gap: 4px;">
-          <input type="text" id="new-agent-input" placeholder="Agent name" style="flex: 1; padding: 4px 6px; font-size: 11px;">
-          <button id="add-agent-btn" class="small-btn" style="padding: 4px 8px; font-size: 11px;">Add</button>
+      <div class="add-agent-container">
+        <div class="add-agent-input-group">
+          <input type="text" id="new-agent-input" placeholder="Agent name" class="new-agent-input" aria-label="New agent name">
+          <button id="add-agent-btn" class="small-btn" aria-label="Add agent">Add</button>
         </div>
       </div>
       
       <!-- Agent List -->
-      <div id="agent-list-container" style="max-height: 150px; overflow-y: auto;">
+      <div id="agent-list-container" class="agent-list-container">
         <!-- Populated dynamically -->
       </div>
     </div>
   </div>
-  <div id="error-message" style="display: none; margin-top: 10px; padding: 8px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 4px; font-size: 12px;"></div>
+  <div id="error-message" class="error-message" role="alert" aria-live="polite"></div>
+  <div id="success-message" class="success-message" role="status" aria-live="polite"></div>
   <script src="scripts/constants.js"></script>
   <script src="scripts/helpers.js"></script>
   <script src="scripts/storage.js"></script>

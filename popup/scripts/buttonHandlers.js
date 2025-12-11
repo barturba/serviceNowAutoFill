@@ -20,10 +20,26 @@ function debounce(fn, delay = 300) {
 }
 
 /**
+ * Set loading state on a button
+ * @param {HTMLElement} button - Button element
+ * @param {boolean} loading - Whether button should be in loading state
+ */
+function setButtonLoading(button, loading) {
+  if (loading) {
+    button.classList.add('loading');
+    button.disabled = true;
+  } else {
+    button.classList.remove('loading');
+    button.disabled = false;
+  }
+}
+
+/**
  * Execute operation with progress tracking to prevent simultaneous operations
  * @param {Function} operation - Operation to execute
+ * @param {HTMLElement} button - Button element to show loading state on
  */
-async function executeWithProgressTracking(operation) {
+async function executeWithProgressTracking(operation, button) {
   if (isOperationInProgress) {
     console.log('Operation already in progress, ignoring click');
     return;
@@ -31,8 +47,14 @@ async function executeWithProgressTracking(operation) {
   
   try {
     isOperationInProgress = true;
+    if (button) {
+      setButtonLoading(button, true);
+    }
     await operation();
   } finally {
+    if (button) {
+      setButtonLoading(button, false);
+    }
     // Reset after a short delay to allow UI to update
     setTimeout(() => {
       isOperationInProgress = false;
@@ -47,7 +69,7 @@ function setupTimeButtonHandler(button) {
         (timeValue, commentText) => window.fillTimeInNestedFrame?.(timeValue, commentText) || 
           Promise.reject(new Error('fillTimeInNestedFrame not found')),
         [button.getAttribute('data-time'), getCommentText()]);
-    });
+    }, button);
   });
 }
 
@@ -58,7 +80,7 @@ function setupTimeSaveButtonHandler(button) {
         (timeValue, commentText) => window.fillTimeInNestedFrameAndSave?.(timeValue, commentText) ||
           Promise.reject(new Error('fillTimeInNestedFrameAndSave not found')),
         [button.getAttribute('data-time'), getCommentText()]);
-    });
+    }, button);
   });
 }
 
@@ -67,7 +89,7 @@ function setupAlertClearedButtonHandler(button) {
     executeWithProgressTracking(() => {
       injectAndExecute('processAlertCleared',
         () => window.processAlertCleared?.() || Promise.reject(new Error('processAlertCleared not found')));
-    });
+    }, button);
   });
 }
 
@@ -88,7 +110,7 @@ function setupMacdAssignmentButtonHandler(button) {
       injectAndExecute('processMacdAssignment',
         (agentName) => window.processMacdAssignment?.(agentName) || Promise.reject(new Error('processMacdAssignment not found')),
         [agentName]);
-    });
+    }, button);
   });
 }
 

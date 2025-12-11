@@ -3,18 +3,34 @@
  */
 
 /**
- * Display error message in popup UI
+ * Display error message in popup UI with dismiss button
  * @param {string} message - Error message to display
  */
 function showError(message) {
   const errorElement = document.getElementById('error-message');
   if (errorElement) {
+    // Clear any existing dismiss button
+    const existingDismiss = errorElement.querySelector('.message-dismiss');
+    if (existingDismiss) {
+      existingDismiss.remove();
+    }
+    
     errorElement.textContent = message;
-    errorElement.style.display = 'block';
-    // Auto-hide after 5 seconds
+    
+    // Add dismiss button
+    const dismissBtn = document.createElement('button');
+    dismissBtn.className = 'message-dismiss';
+    dismissBtn.innerHTML = '×';
+    dismissBtn.setAttribute('aria-label', 'Dismiss error message');
+    dismissBtn.onclick = () => hideError();
+    errorElement.appendChild(dismissBtn);
+    
+    errorElement.classList.add('show');
+    
+    // Auto-hide after 8 seconds (increased from 5)
     setTimeout(() => {
-      errorElement.style.display = 'none';
-    }, 5000);
+      hideError();
+    }, 8000);
   } else {
     // Fallback to console if element not found
     console.error('Error:', message);
@@ -22,13 +38,70 @@ function showError(message) {
 }
 
 /**
- * Clear error message display
+ * Hide error message display
  */
-function clearError() {
+function hideError() {
   const errorElement = document.getElementById('error-message');
   if (errorElement) {
-    errorElement.style.display = 'none';
+    errorElement.classList.remove('show');
+    setTimeout(() => {
+      errorElement.style.display = 'none';
+    }, 300); // Wait for animation to complete
   }
+}
+
+/**
+ * Display success message in popup UI
+ * @param {string} message - Success message to display
+ */
+function showSuccess(message) {
+  const successElement = document.getElementById('success-message');
+  if (successElement) {
+    // Clear any existing dismiss button
+    const existingDismiss = successElement.querySelector('.message-dismiss');
+    if (existingDismiss) {
+      existingDismiss.remove();
+    }
+    
+    successElement.textContent = message;
+    
+    // Add dismiss button
+    const dismissBtn = document.createElement('button');
+    dismissBtn.className = 'message-dismiss';
+    dismissBtn.innerHTML = '×';
+    dismissBtn.setAttribute('aria-label', 'Dismiss success message');
+    dismissBtn.onclick = () => hideSuccess();
+    successElement.appendChild(dismissBtn);
+    
+    successElement.style.display = 'block';
+    successElement.classList.add('show');
+    
+    // Auto-hide after 3 seconds
+    setTimeout(() => {
+      hideSuccess();
+    }, 3000);
+  }
+}
+
+/**
+ * Hide success message display
+ */
+function hideSuccess() {
+  const successElement = document.getElementById('success-message');
+  if (successElement) {
+    successElement.classList.remove('show');
+    setTimeout(() => {
+      successElement.style.display = 'none';
+    }, 300); // Wait for animation to complete
+  }
+}
+
+/**
+ * Clear error message display (backward compatibility)
+ */
+function clearError() {
+  hideError();
+  hideSuccess();
 }
 
 /**
@@ -46,7 +119,11 @@ function handleInjectionError(error) {
  */
 function handleExecutionResult(result) {
   if (result && result.success) {
-    window.close();
+    showSuccess('Operation completed successfully!');
+    // Close after a short delay to show success message
+    setTimeout(() => {
+      window.close();
+    }, 500);
   } else {
     showError('Failed: ' + (result?.error || 'Unknown error'));
   }
@@ -132,7 +209,11 @@ function executeFunction(tabId, funcExecutor, args) {
     } else if (results && results[0] && results[0].result) {
       handleExecutionResult(results[0].result);
     } else {
-      window.close();
+      // No result returned, assume success and show message before closing
+      showSuccess('Operation completed successfully!');
+      setTimeout(() => {
+        window.close();
+      }, 500);
     }
   });
 }
