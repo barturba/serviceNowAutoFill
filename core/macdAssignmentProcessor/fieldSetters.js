@@ -8,4 +8,5 @@ window.setCategoryField = setCategoryField;
 window.setSubcategoryField = setSubcategoryField;
 window.setAssignmentGroupField = setAssignmentGroupField;
 window.setAssignedToField = setAssignedToField;
+window.setStateField = setStateField;
 

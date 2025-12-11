@@ -11,11 +11,13 @@ const PROCESSOR_FILES = [
   'core/alertClearedProcessor.js',
   'core/macdAssignmentProcessor/fieldSetters/categorySetters.js',
   'core/macdAssignmentProcessor/fieldSetters/assignmentSetters.js',
+  'core/macdAssignmentProcessor/fieldSetters/stateSetters.js',
   'core/macdAssignmentProcessor/fieldSetters.js',
   'core/macdAssignmentProcessor/steps/setCategoryStep.js',
   'core/macdAssignmentProcessor/steps/setSubcategoryStep.js',
   'core/macdAssignmentProcessor/steps/setAssignmentGroupStep.js',
   'core/macdAssignmentProcessor/steps/setAssignedToStep.js',
+  'core/macdAssignmentProcessor/steps/setStateStep.js',
   'core/macdAssignmentProcessor/steps.js',
   'core/macdAssignmentProcessor.js'
 ];

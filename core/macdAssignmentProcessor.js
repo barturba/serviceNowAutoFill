@@ -17,6 +17,7 @@ async function processMacdAssignment(doc, agentName) {
     await setSubcategoryStep(doc, fieldsToUpdate, errors);
     await setAssignmentGroupStep(doc, fieldsToUpdate, errors);
     await setAssignedToStep(doc, agentName, fieldsToUpdate, errors);
+    await setStateStep(doc, fieldsToUpdate, errors);
 
     // Dispatch final events on all updated fields
     fieldsToUpdate.forEach(field => window.dispatchFieldEvents(field, ['input', 'change']));
