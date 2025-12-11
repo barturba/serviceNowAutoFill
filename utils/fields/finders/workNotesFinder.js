@@ -4,16 +4,18 @@
  * @returns {Promise<{field: HTMLElement|null, editable: HTMLElement|null}>} Object with field and editable element
  */
 window.FieldFinder.findWorkNotesField = async function(doc) {
-  let workNotesField = doc.querySelector('textarea#activity-stream-textarea') ||
-                      doc.querySelector('textarea[data-stream-text-input="work_notes"]') ||
-                      doc.querySelector('textarea[ng-model*="inputTypeValue"]') ||
-                      doc.querySelector('textarea[id*="activity-stream"][id*="work_notes"]') ||
-                      doc.querySelector('textarea[id$=".work_notes"]') ||
-                      doc.querySelector('textarea[id$="work_notes"]') ||
-                      doc.querySelector('textarea[name$=".work_notes"]') ||
-                      doc.querySelector('input[id$=".work_notes"]') ||
-                      doc.querySelector('textarea[id*="work_notes"]') ||
-                      doc.querySelector('input[id*="work_notes"]');
+  let workNotesField = window.FieldFinder.querySelectorFirst(doc, [
+    'textarea#activity-stream-textarea',
+    'textarea[data-stream-text-input="work_notes"]',
+    'textarea[ng-model*="inputTypeValue"]',
+    'textarea[id*="activity-stream"][id*="work_notes"]',
+    'textarea[id$=".work_notes"]',
+    'textarea[id$="work_notes"]',
+    'textarea[name$=".work_notes"]',
+    'input[id$=".work_notes"]',
+    'textarea[id*="work_notes"]',
+    'input[id*="work_notes"]'
+  ]);
   if (!workNotesField) {
     console.log('Waiting for work_notes field...');
     try {
@@ -25,8 +27,10 @@ window.FieldFinder.findWorkNotesField = async function(doc) {
   console.log('Found work_notes:', workNotesField?.id, 'tag:', workNotesField?.tagName, 'has ng-model:', workNotesField?.getAttribute('ng-model'));
 
   // Also look for contenteditable rich text editor for work_notes
-  let workNotesEditable = doc.querySelector('[id*="work_notes"][contenteditable="true"]') ||
-                          doc.querySelector('[contenteditable="true"][id*="work_notes"]');
+  let workNotesEditable = window.FieldFinder.querySelectorFirst(doc, [
+    '[id*="work_notes"][contenteditable="true"]',
+    '[contenteditable="true"][id*="work_notes"]'
+  ]);
   if (workNotesEditable) {
     console.log('Found work_notes contenteditable element:', workNotesEditable.id || workNotesEditable.className);
   }

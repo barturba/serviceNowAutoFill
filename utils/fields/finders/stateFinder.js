@@ -4,12 +4,14 @@
  * @returns {Promise<HTMLElement|null>} The state field or null
  */
 window.FieldFinder.findStateField = async function(doc) {
-  let stateField = doc.querySelector('select[id$=".state"]') ||
-                  doc.querySelector('select[id$="state"]') ||
-                  doc.querySelector('select[name$=".state"]') ||
-                  doc.querySelector('select[id*="state"]') ||
-                  doc.querySelector('input[id$=".state"]') ||
-                  doc.querySelector('input[id*="state"]');
+  let stateField = window.FieldFinder.querySelectorFirst(doc, [
+    'select[id$=".state"]',
+    'select[id$="state"]',
+    'select[name$=".state"]',
+    'select[id*="state"]',
+    'input[id$=".state"]',
+    'input[id*="state"]'
+  ]);
   if (!stateField) {
     console.log('Waiting for state field...');
     try {

@@ -4,13 +4,15 @@
  * @returns {Promise<HTMLElement|null>} The work_type field or null
  */
 window.FieldFinder.findWorkTypeField = async function(doc) {
-  let workTypeField = doc.querySelector('select[id$=".u_work_type"]') ||
-                     doc.querySelector('select[id$="u_work_type"]') ||
-                     doc.querySelector('select[name$=".u_work_type"]') ||
-                     doc.querySelector('select[id*="work_type"]') ||
-                     doc.querySelector('input[id$=".u_work_type"]') ||
-                     doc.querySelector('input[id$="u_work_type"]') ||
-                     doc.querySelector('input[id*="work_type"]');
+  let workTypeField = window.FieldFinder.querySelectorFirst(doc, [
+    'select[id$=".u_work_type"]',
+    'select[id$="u_work_type"]',
+    'select[name$=".u_work_type"]',
+    'select[id*="work_type"]',
+    'input[id$=".u_work_type"]',
+    'input[id$="u_work_type"]',
+    'input[id*="work_type"]'
+  ]);
   if (!workTypeField) {
     console.log('Waiting for work_type field...');
     try {

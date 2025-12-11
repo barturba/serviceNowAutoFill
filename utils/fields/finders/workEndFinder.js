@@ -4,10 +4,12 @@
  * @returns {Promise<HTMLElement|null>} The work_end field or null
  */
 window.FieldFinder.findWorkEndField = async function(doc) {
-  let endField = doc.querySelector('input[id$=".u_work_end"]:not([type="hidden"])') ||
-                doc.querySelector('input[id$="u_work_end"]:not([type="hidden"])') ||
-                doc.querySelector('input[name$=".u_work_end"]:not([type="hidden"])') ||
-                doc.querySelector('input[id*="work_end"]:not([type="hidden"])');
+  let endField = window.FieldFinder.querySelectorFirst(doc, [
+    'input[id$=".u_work_end"]:not([type="hidden"])',
+    'input[id$="u_work_end"]:not([type="hidden"])',
+    'input[name$=".u_work_end"]:not([type="hidden"])',
+    'input[id*="work_end"]:not([type="hidden"])'
+  ]);
   if (!endField) {
     console.log('Waiting for work_end field...');
     try {

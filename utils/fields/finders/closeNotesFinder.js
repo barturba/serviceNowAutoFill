@@ -4,14 +4,16 @@
  * @returns {Promise<HTMLElement|null>} The close_notes field or null
  */
 window.FieldFinder.findCloseNotesField = async function(doc) {
-  let closeNotesField = doc.querySelector('textarea[id$=".close_notes"]') ||
-                       doc.querySelector('textarea[id$="close_notes"]') ||
-                       doc.querySelector('textarea[name$=".close_notes"]') ||
-                       doc.querySelector('textarea[id*="close_notes"]') ||
-                       doc.querySelector('textarea[id$=".resolution_notes"]') ||
-                       doc.querySelector('textarea[id*="resolution_notes"]') ||
-                       doc.querySelector('input[id*="close_notes"]') ||
-                       doc.querySelector('input[id*="resolution_notes"]');
+  let closeNotesField = window.FieldFinder.querySelectorFirst(doc, [
+    'textarea[id$=".close_notes"]',
+    'textarea[id$="close_notes"]',
+    'textarea[name$=".close_notes"]',
+    'textarea[id*="close_notes"]',
+    'textarea[id$=".resolution_notes"]',
+    'textarea[id*="resolution_notes"]',
+    'input[id*="close_notes"]',
+    'input[id*="resolution_notes"]'
+  ]);
   if (!closeNotesField) {
     console.log('Waiting for close_notes field...');
     try {

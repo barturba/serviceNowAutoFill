@@ -4,12 +4,14 @@
  * @returns {Promise<HTMLElement|null>} The category field or null
  */
 window.FieldFinder.findCategoryField = async function(doc) {
-  let categoryField = doc.querySelector('select[id$=".category"]') ||
-                     doc.querySelector('select[id$="category"]') ||
-                     doc.querySelector('select[name$=".category"]') ||
-                     doc.querySelector('select[id*="category"]') ||
-                     doc.querySelector('input[id$=".category"]') ||
-                     doc.querySelector('input[id*="category"]');
+  let categoryField = window.FieldFinder.querySelectorFirst(doc, [
+    'select[id$=".category"]',
+    'select[id$="category"]',
+    'select[name$=".category"]',
+    'select[id*="category"]',
+    'input[id$=".category"]',
+    'input[id*="category"]'
+  ]);
   if (!categoryField) {
     console.log('Waiting for category field...');
     try {

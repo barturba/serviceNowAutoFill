@@ -4,12 +4,14 @@
  * @returns {Promise<HTMLElement|null>} The assignment_group field or null
  */
 window.FieldFinder.findAssignmentGroupField = async function(doc) {
-  let assignmentGroupField = doc.querySelector('select[id$=".assignment_group"]') ||
-                            doc.querySelector('select[id$="assignment_group"]') ||
-                            doc.querySelector('select[name$=".assignment_group"]') ||
-                            doc.querySelector('select[id*="assignment_group"]') ||
-                            doc.querySelector('input[id$=".assignment_group"]') ||
-                            doc.querySelector('input[id*="assignment_group"]');
+  let assignmentGroupField = window.FieldFinder.querySelectorFirst(doc, [
+    'select[id$=".assignment_group"]',
+    'select[id$="assignment_group"]',
+    'select[name$=".assignment_group"]',
+    'select[id*="assignment_group"]',
+    'input[id$=".assignment_group"]',
+    'input[id*="assignment_group"]'
+  ]);
   if (!assignmentGroupField) {
     console.log('Waiting for assignment_group field...');
     try {

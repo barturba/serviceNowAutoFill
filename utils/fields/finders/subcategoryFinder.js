@@ -4,12 +4,14 @@
  * @returns {Promise<HTMLElement|null>} The subcategory field or null
  */
 window.FieldFinder.findSubcategoryField = async function(doc) {
-  let subcategoryField = doc.querySelector('select[id$=".subcategory"]') ||
-                        doc.querySelector('select[id$="subcategory"]') ||
-                        doc.querySelector('select[name$=".subcategory"]') ||
-                        doc.querySelector('select[id*="subcategory"]') ||
-                        doc.querySelector('input[id$=".subcategory"]') ||
-                        doc.querySelector('input[id*="subcategory"]');
+  let subcategoryField = window.FieldFinder.querySelectorFirst(doc, [
+    'select[id$=".subcategory"]',
+    'select[id$="subcategory"]',
+    'select[name$=".subcategory"]',
+    'select[id*="subcategory"]',
+    'input[id$=".subcategory"]',
+    'input[id*="subcategory"]'
+  ]);
   if (!subcategoryField) {
     console.log('Waiting for subcategory field...');
     try {

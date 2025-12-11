@@ -4,14 +4,16 @@
  * @returns {Promise<HTMLElement|null>} The resolution_code field or null
  */
 window.FieldFinder.findResolutionCodeField = async function(doc) {
-  let resolutionCodeField = doc.querySelector('select[id$=".close_code"]') ||
-                           doc.querySelector('select[id$="close_code"]') ||
-                           doc.querySelector('select[name$=".close_code"]') ||
-                           doc.querySelector('select[id*="close_code"]') ||
-                           doc.querySelector('select[id$=".resolution_code"]') ||
-                           doc.querySelector('select[id$="resolution_code"]') ||
-                           doc.querySelector('input[id*="close_code"]') ||
-                           doc.querySelector('input[id*="resolution_code"]');
+  let resolutionCodeField = window.FieldFinder.querySelectorFirst(doc, [
+    'select[id$=".close_code"]',
+    'select[id$="close_code"]',
+    'select[name$=".close_code"]',
+    'select[id*="close_code"]',
+    'select[id$=".resolution_code"]',
+    'select[id$="resolution_code"]',
+    'input[id*="close_code"]',
+    'input[id*="resolution_code"]'
+  ]);
   if (!resolutionCodeField) {
     console.log('Waiting for resolution_code field...');
     try {
