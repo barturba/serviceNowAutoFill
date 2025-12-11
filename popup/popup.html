@@ -34,15 +34,21 @@
   </div>
   <div class="section-divider">
     <h3 class="section-subtitle">MACD Assignment</h3>
-    <div class="comments-input-container">
-      <label for="taskmaster-agent-input">Taskmaster Agent</label>
-      <input type="text" id="taskmaster-agent-input" list="agent-list" placeholder="Select or type agent name" aria-label="Taskmaster agent name">
-      <datalist id="agent-list">
-        <!-- Populated dynamically -->
-      </datalist>
-      <button id="manage-agents-btn" class="manage-agents-btn" aria-label="Manage agents list">Manage Agents</button>
+    <div class="macd-form-group">
+      <div class="comments-input-container">
+        <label for="taskmaster-agent-input">Agent</label>
+        <select id="taskmaster-agent-input" aria-label="Agent name">
+          <option value="">Select agent</option>
+          <!-- Populated dynamically -->
+        </select>
+      </div>
+      <button class="macd-assignment-btn full-width-btn" aria-label="Assign to MACD">Assign to MACD</button>
+      <div class="manage-agents-link-container">
+        <button id="manage-agents-btn" class="manage-agents-link" aria-label="Manage agents list">
+          Manage Agents
+        </button>
+      </div>
     </div>
-    <button class="macd-assignment-btn full-width-btn" aria-label="Assign to MACD">Assign to MACD</button>
     
     <!-- Agent Management Section -->
     <div id="agent-management" class="agent-management-section">

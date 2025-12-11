@@ -42,7 +42,8 @@ button {
   transition: background 0.2s;
 }
 
-button:hover {
+/* Base hover - only applies if no specific hover is defined */
+button:not(.time-save-btn):not(.alert-cleared-btn):not(.macd-assignment-btn):not(.small-btn):not(.agent-action-btn):not(.manage-agents-link):not(.refresh-btn):hover {
   background: #0056b3;
 }
 
@@ -131,6 +132,10 @@ button:active {
   margin-bottom: 10px;
 }
 
+.macd-form-group .comments-input-container {
+  margin-bottom: 0;
+}
+
 .comments-input-container label {
   display: block;
   font-size: 12px;
@@ -138,7 +143,8 @@ button:active {
   margin-bottom: 4px;
 }
 
-.comments-input-container input {
+.comments-input-container input,
+.comments-input-container select {
   width: 100%;
   padding: 6px 8px;
   border: 1px solid #ddd;
@@ -146,11 +152,21 @@ button:active {
   font-size: 12px;
   font-family: Arial;
   box-sizing: border-box;
+  background: white;
 }
 
-.comments-input-container input:focus {
+.comments-input-container input:focus,
+.comments-input-container select:focus {
   outline: none;
   border-color: #007bff;
+}
+
+.comments-input-container select {
+  cursor: pointer;
+}
+
+.comments-input-container select:hover {
+  border-color: #bbb;
 }
 
 /* ============================================================================
@@ -190,35 +206,56 @@ button:active {
   transform: scale(0.98);
 }
 
+/* ============================================================================
+   MACD Form Group
+   ============================================================================ */
+
+.macd-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .macd-assignment-btn {
-  margin-top: 8px;
+  margin-top: 0;
 }
 
 /* ============================================================================
-   Manage Agents Button
+   Manage Agents Link
    ============================================================================ */
 
-.manage-agents-btn {
-  width: 100%;
-  margin-top: 6px;
-  padding: 4px 8px;
-  font-size: 11px;
-  background: #6c757d;
-  color: white;
+.manage-agents-link-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.manage-agents-link {
+  background: none;
   border: none;
-  border-radius: 3px;
+  color: #666;
+  font-size: 11px;
   cursor: pointer;
-  transition: background 0.2s;
+  padding: 4px 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 2px;
 }
 
-.manage-agents-btn:hover {
-  background: #5a6268;
+.manage-agents-link:hover {
+  color: #007bff;
+  text-decoration-color: #007bff;
 }
 
-.manage-agents-btn:active {
-  background: #545b62;
-  transform: scale(0.98);
+.manage-agents-link:active {
+  color: #0056b3;
+  transform: none;
 }
+
 
 /* ============================================================================
    Agent Management Section
@@ -226,9 +263,22 @@ button:active {
 
 .agent-management-section {
   display: none;
-  margin-top: 10px;
-  padding-top: 10px;
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: opacity 0.2s ease-out, max-height 0.3s ease-out, margin-top 0.2s ease-out, padding-top 0.2s ease-out, border-top-width 0.2s ease-out;
+}
+
+.agent-management-section.visible {
+  display: block;
+  margin-top: 12px;
+  padding-top: 12px;
   border-top: 1px solid #ddd;
+  opacity: 1;
+  max-height: 500px;
 }
 
 .agent-management-title {
@@ -453,6 +503,16 @@ input:focus-visible {
   background-color: #f8f9fa;
 }
 
+.agent-list-item.selected {
+  background-color: #e7f3ff;
+  border-left: 3px solid #007bff;
+  padding-left: 1px;
+}
+
+.agent-list-item.selected:hover {
+  background-color: #d6ebff;
+}
+
 .agent-list-item:last-child {
   border-bottom: none;
 }
@@ -464,6 +524,11 @@ input:focus-visible {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.agent-list-item.selected .agent-name {
+  font-weight: 600;
+  color: #007bff;
 }
 
 .agent-action-btn {

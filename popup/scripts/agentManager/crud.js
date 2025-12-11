@@ -24,10 +24,12 @@ async function addAgent(name) {
   agents.push(trimmedName);
   await saveMacdAgentsCache(agents);
   
-  // Update datalist
-  populateAgentDatalist(agents);
+  // Update select dropdown
+  if (typeof populateAgentSelect === 'function') {
+    populateAgentSelect(agents);
+  }
   
-  // Refresh agent list display
+  // Refresh agent list display and update badge
   await loadAndRenderAgents();
   
   showAgentSuccess('Agent added successfully');
@@ -58,18 +60,25 @@ async function updateAgent(oldName, newName) {
 
   await updateAgentInStorage(oldName, trimmedNewName);
   
-  // Update datalist
+  // Update select dropdown
   const updatedAgents = await getAllAgents();
-  populateAgentDatalist(updatedAgents);
+  if (typeof populateAgentSelect === 'function') {
+    populateAgentSelect(updatedAgents);
+  }
   
-  // Refresh agent list display
+  // Refresh agent list display and update badge
   await loadAndRenderAgents();
   
-  // Update taskmaster input if it was set to the old name
-  const agentInput = document.getElementById('taskmaster-agent-input');
-  if (agentInput && agentInput.value === oldName) {
-    agentInput.value = trimmedNewName;
+  // Update taskmaster select if it was set to the old name
+  const agentSelect = document.getElementById('taskmaster-agent-input');
+  if (agentSelect && agentSelect.value === oldName) {
+    agentSelect.value = trimmedNewName;
     await saveTaskmasterAgent(trimmedNewName);
+  }
+  
+  // Update visual indicators
+  if (typeof updateAgentSelectionIndicators === 'function') {
+    updateAgentSelectionIndicators();
   }
   
   showAgentSuccess('Agent updated successfully');
@@ -93,18 +102,25 @@ async function deleteAgent(name) {
 
   await removeAgentFromStorage(name);
   
-  // Update datalist
+  // Update select dropdown
   const updatedAgents = await getAllAgents();
-  populateAgentDatalist(updatedAgents);
+  if (typeof populateAgentSelect === 'function') {
+    populateAgentSelect(updatedAgents);
+  }
   
-  // Refresh agent list display
+  // Refresh agent list display and update badge
   await loadAndRenderAgents();
   
-  // Clear taskmaster input if it was set to the deleted agent
-  const agentInput = document.getElementById('taskmaster-agent-input');
-  if (agentInput && agentInput.value === name) {
-    agentInput.value = '';
+  // Clear taskmaster select if it was set to the deleted agent
+  const agentSelect = document.getElementById('taskmaster-agent-input');
+  if (agentSelect && agentSelect.value === name) {
+    agentSelect.value = '';
     await saveTaskmasterAgent('');
+  }
+  
+  // Update visual indicators
+  if (typeof updateAgentSelectionIndicators === 'function') {
+    updateAgentSelectionIndicators();
   }
   
   showAgentSuccess('Agent deleted successfully');

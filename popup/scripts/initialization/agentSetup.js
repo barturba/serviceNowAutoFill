@@ -3,22 +3,31 @@
  */
 
 /**
- * Populate agent datalist with agent names
+ * Populate agent select dropdown with agent names
  * @param {string[]} agents - Array of agent names
  */
-function populateAgentDatalist(agents) {
-  const datalist = document.getElementById('agent-list');
-  if (!datalist) return;
+function populateAgentSelect(agents) {
+  const select = document.getElementById('taskmaster-agent-input');
+  if (!select) return;
 
-  // Clear existing options
-  datalist.innerHTML = '';
+  // Get current selected value to preserve it
+  const currentValue = select.value;
 
-  // Add new options
+  // Clear existing options except the placeholder
+  select.innerHTML = '<option value="">Select agent</option>';
+
+  // Add agent options
   agents.forEach(agent => {
     const option = document.createElement('option');
     option.value = agent;
-    datalist.appendChild(option);
+    option.textContent = agent;
+    select.appendChild(option);
   });
+
+  // Restore selection if it still exists
+  if (currentValue && agents.includes(currentValue)) {
+    select.value = currentValue;
+  }
 }
 
 /**
@@ -38,10 +47,10 @@ async function loadMacdAgents() {
   // Try to load from cache/storage first
   const cache = await loadMacdAgentsCache();
   if (cache && cache.agents && cache.agents.length > 0) {
-    populateAgentDatalist(cache.agents);
+    populateAgentSelect(cache.agents);
   } else {
     // Use default list
-    populateAgentDatalist(defaultAgents);
+    populateAgentSelect(defaultAgents);
     // Save defaults to cache
     await saveMacdAgentsCache(defaultAgents);
   }

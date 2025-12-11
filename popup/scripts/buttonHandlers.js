@@ -96,11 +96,11 @@ function setupAlertClearedButtonHandler(button) {
 function setupMacdAssignmentButtonHandler(button) {
   button.addEventListener('click', async () => {
     await executeWithProgressTracking(async () => {
-      const agentInput = document.getElementById('taskmaster-agent-input');
-      const agentName = agentInput ? agentInput.value.trim() : '';
+      const agentSelect = document.getElementById('taskmaster-agent-input');
+      const agentName = agentSelect ? agentSelect.value.trim() : '';
       
       if (!agentName) {
-        showError('Please select or enter a taskmaster agent');
+        showError('Please select an agent');
         return;
       }
 

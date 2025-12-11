@@ -22,12 +22,6 @@ function setupRefreshAgentsButton() {
 function setupManageAgentsButton() {
   const manageAgentsBtn = document.getElementById('manage-agents-btn');
   if (manageAgentsBtn) {
-    manageAgentsBtn.addEventListener('mouseenter', () => {
-      manageAgentsBtn.style.background = '#5a6268';
-    });
-    manageAgentsBtn.addEventListener('mouseleave', () => {
-      manageAgentsBtn.style.background = '#6c757d';
-    });
     manageAgentsBtn.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -71,12 +65,32 @@ function setupAddAgentButton() {
 }
 
 /**
+ * Setup agent select dropdown change handler
+ */
+function setupAgentSelectHandler() {
+  const agentSelect = document.getElementById('taskmaster-agent-input');
+  if (agentSelect) {
+    agentSelect.addEventListener('change', async (e) => {
+      const selectedAgent = e.target.value;
+      if (selectedAgent && typeof saveTaskmasterAgent === 'function') {
+        await saveTaskmasterAgent(selectedAgent);
+      }
+      // Update visual indicators
+      if (typeof updateAgentSelectionIndicators === 'function') {
+        updateAgentSelectionIndicators();
+      }
+    });
+  }
+}
+
+/**
  * Setup all agent-related event handlers
  */
 function setupAgentEventHandlers() {
   setupRefreshAgentsButton();
   setupManageAgentsButton();
   setupAddAgentButton();
+  setupAgentSelectHandler();
 }
 
 /**
