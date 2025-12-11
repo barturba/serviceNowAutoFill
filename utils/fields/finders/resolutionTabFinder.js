@@ -73,9 +73,9 @@ function findResolutionTab(doc) {
 async function clickResolutionTab(resolutionTab, doc, restoreScroll) {
   resolutionTab.click();
   restoreScroll();
-  await new Promise(resolve => setTimeout(resolve, window.TimingConstants.DELAY_TAB_SWITCH_INITIAL));
+  await window.delay(window.TimingConstants.DELAY_TAB_SWITCH_INITIAL);
   restoreScroll();
-  await new Promise(resolve => setTimeout(resolve, window.TimingConstants.DELAY_TAB_SWITCH_FINAL));
+  await window.delay(window.TimingConstants.DELAY_TAB_SWITCH_FINAL);
   restoreScroll();
 }
 

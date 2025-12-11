@@ -56,7 +56,7 @@ async function setAssignmentGroupStep(doc, fieldsToUpdate, errors) {
     
     // Wait for ServiceNow to process Assignment Group changes
     console.log('Waiting for ServiceNow to process Assignment Group changes...');
-    await new Promise(resolve => setTimeout(resolve, window.TimingConstants.DELAY_ASSIGNMENT_GROUP_PROCESS));
+    await window.delay(window.TimingConstants.DELAY_ASSIGNMENT_GROUP_PROCESS);
   } else {
     errors.push('Assignment Group field not found');
     console.log('✗ Assignment Group field not found');

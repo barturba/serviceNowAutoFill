@@ -91,7 +91,7 @@ async function processAlertCleared(doc) {
 
     fieldsToUpdate.forEach(field => window.dispatchFieldEvents(field, ['input', 'change']));
     restoreScroll();
-    await new Promise(resolve => setTimeout(resolve, window.TimingConstants.DELAY_ALERT_CLEARED));
+    await window.delay(window.TimingConstants.DELAY_ALERT_CLEARED);
     restoreScroll();
     return { success: true };
   } catch (error) {

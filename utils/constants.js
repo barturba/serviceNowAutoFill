@@ -24,3 +24,13 @@ window.TimingConstants = window.TimingConstants || {
   DELAY_ASSIGNMENT_GROUP_PROCESS
 };
 
+/**
+ * Delay utility function for cleaner Promise-based delays
+ * Replaces sequential setTimeout calls with a more readable API
+ * @param {number} ms - Milliseconds to delay
+ * @returns {Promise<void>} Promise that resolves after the delay
+ */
+window.delay = function(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+};
+

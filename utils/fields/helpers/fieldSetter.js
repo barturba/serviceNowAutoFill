@@ -65,7 +65,7 @@ function dispatchFieldEvents(field, eventTypes = ['input', 'change']) {
 async function clearFieldValue(field) {
   field.value = '';
   field.dispatchEvent(new Event('input', { bubbles: true }));
-  await new Promise(resolve => setTimeout(resolve, 100));
+  await window.delay(100);
 }
 
 /**
@@ -81,7 +81,7 @@ async function setFieldValueWithGForm(doc, field, fieldName, value) {
   if (gForm) {
     try {
       gForm.setValue(fieldName, '');
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await window.delay(100);
       gForm.setValue(fieldName, value);
       console.log(`✓ Set ${fieldName} to "${value}" using g_form.setValue()`);
       dispatchFieldEvents(field, ['input', 'change', 'blur']);

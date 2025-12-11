@@ -37,21 +37,62 @@ window.FieldFinder.waitForElement = async function(doc, selector, timeout = 1000
       resolveWait(element);
       return;
     }
-    const observer = new MutationObserver(() => {
-      const element = doc.querySelector(selector);
-      if (element) {
+    
+    let observer = null;
+    let timeoutId = null;
+    let isResolved = false;
+    
+    // Cleanup function to ensure observer and timeout are always cleared
+    const cleanup = () => {
+      if (observer) {
         observer.disconnect();
-        resolveWait(element);
+        observer = null;
       }
-    });
-    observer.observe(doc.body || doc.documentElement, {
-      childList: true,
-      subtree: true
-    });
-    setTimeout(() => {
-      observer.disconnect();
-      rejectWait(new Error(`Timeout waiting for ${selector}`));
-    }, timeout);
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      }
+    };
+    
+    // Resolve function that ensures cleanup
+    const resolve = (value) => {
+      if (!isResolved) {
+        isResolved = true;
+        cleanup();
+        resolveWait(value);
+      }
+    };
+    
+    // Reject function that ensures cleanup
+    const reject = (error) => {
+      if (!isResolved) {
+        isResolved = true;
+        cleanup();
+        rejectWait(error);
+      }
+    };
+    
+    try {
+      observer = new MutationObserver(() => {
+        const element = doc.querySelector(selector);
+        if (element) {
+          resolve(element);
+        }
+      });
+      
+      observer.observe(doc.body || doc.documentElement, {
+        childList: true,
+        subtree: true
+      });
+      
+      timeoutId = setTimeout(() => {
+        reject(new Error(`Timeout waiting for ${selector}`));
+      }, timeout);
+    } catch (error) {
+      // If observer creation fails, cleanup and reject
+      cleanup();
+      reject(error);
+    }
   });
 };
 

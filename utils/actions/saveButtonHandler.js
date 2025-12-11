@@ -3,7 +3,7 @@
  */
 
 async function clickSaveButton() {
-  await new Promise(resolve => setTimeout(resolve, window.TimingConstants.DELAY_BUTTON_CLICK));
+  await window.delay(window.TimingConstants.DELAY_BUTTON_CLICK);
   const saveButton = await window.findSaveButton();
   if (!saveButton) {
     console.warn('⚠ Save button (#sysverb_update_and_stay) not found');
@@ -29,7 +29,7 @@ async function clickSaveButton() {
     console.log('✓ Save button clicked');
     
     // Wait a bit longer to allow the page to react to the click
-    await new Promise(resolve => setTimeout(resolve, window.TimingConstants.DELAY_SAVE_VERIFY));
+    await window.delay(window.TimingConstants.DELAY_SAVE_VERIFY);
     
     if (window.verifySaveTriggered(saveButton, wasDisabledBefore)) {
       return { success: true };
