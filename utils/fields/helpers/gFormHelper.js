@@ -3,6 +3,15 @@
  */
 
 /**
+ * Get g_form API from document
+ * @param {Document} doc - Document containing the form
+ * @returns {Object|null} g_form API object or null
+ */
+function getGForm(doc) {
+  return doc.defaultView?.g_form || null;
+}
+
+/**
  * Set work notes using g_form API if available
  * @param {Document} doc - Document containing the form
  * @param {string} workNotesText - Text to set
@@ -34,5 +43,6 @@ function setWorkNotesViaGForm(doc, workNotesText) {
 }
 
 // Make available globally
+window.getGForm = getGForm;
 window.setWorkNotesViaGForm = setWorkNotesViaGForm;
 
