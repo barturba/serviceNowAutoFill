@@ -10,5 +10,6 @@ function setupButtonHandlers() {
   document.querySelectorAll('.time-save-btn').forEach(setupTimeSaveButtonHandler);
   document.querySelectorAll('.alert-cleared-btn').forEach(setupAlertClearedButtonHandler);
   document.querySelectorAll('.macd-assignment-btn').forEach(setupMacdAssignmentButtonHandler);
+  document.querySelectorAll('.open-stale-incidents-btn').forEach(setupOpenStaleIncidentsButtonHandler);
 }
 

@@ -206,6 +206,32 @@ button:active {
   transform: scale(0.98);
 }
 
+.open-stale-incidents-btn {
+  background: #fd7e14;
+}
+
+.open-stale-incidents-btn:hover {
+  background: #e96b02;
+}
+
+.open-stale-incidents-btn:active {
+  background: #d45d00;
+  transform: scale(0.98);
+}
+
+.stale-progress {
+  font-size: 11px;
+  color: #666;
+  text-align: center;
+  margin-top: 6px;
+  min-height: 16px;
+}
+
+.stale-progress.active {
+  color: #fd7e14;
+  font-weight: 500;
+}
+
 /* ============================================================================
    MACD Form Group
    ============================================================================ */

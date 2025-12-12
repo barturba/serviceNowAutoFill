@@ -48,3 +48,18 @@ function setupMacdAssignmentButtonHandler(button) {
     }, button);
   });
 }
+
+function setupOpenStaleIncidentsButtonHandler(button) {
+  button.addEventListener('click', async () => {
+    button.classList.add('loading');
+    button.disabled = true;
+    
+    try {
+      await handleOpenStaleIncidents();
+    } finally {
+      button.classList.remove('loading');
+      button.disabled = false;
+    }
+  });
+}
+
