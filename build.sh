@@ -2,21 +2,21 @@
 
 # Build script for ServiceNow Time Entry Assistant Chrome Extension
 # Creates a zip file ready for Chrome Web Store upload
-# Usage: ./build.sh [--upload] [--publish]
+# Usage: ./build.sh [--draft] [--submit]
 
 set -e  # Exit on error
 
 # Parse arguments
-UPLOAD=false
-PUBLISH=false
+DRAFT=false
+SUBMIT=false
 for arg in "$@"; do
   case $arg in
-    --upload)
-      UPLOAD=true
+    --draft)
+      DRAFT=true
       ;;
-    --publish)
-      PUBLISH=true
-      UPLOAD=true  # Publishing requires upload
+    --submit)
+      SUBMIT=true
+      DRAFT=true  # Submitting requires upload
       ;;
   esac
 done
@@ -67,8 +67,8 @@ echo "Contents:"
 unzip -l "$BUILD_DIR/$ZIP_NAME"
 echo ""
 
-# Upload to Chrome Web Store if --upload flag is set
-if [ "$UPLOAD" = true ]; then
+# Upload to Chrome Web Store if --draft or --submit flag is set
+if [ "$DRAFT" = true ]; then
   echo ""
   echo "=========================================="
   echo "Uploading to Chrome Web Store..."
@@ -116,38 +116,39 @@ if [ "$UPLOAD" = true ]; then
   UPLOAD_STATE=$(echo "$UPLOAD_RESPONSE" | jq -r '.uploadState')
   
   if [ "$UPLOAD_STATE" = "SUCCESS" ]; then
-    echo "✓ Upload successful!"
+    echo "✓ Upload successful! (saved as draft)"
   else
     echo "✗ Upload failed:"
     echo "$UPLOAD_RESPONSE" | jq .
     exit 1
   fi
   
-  # Publish if --publish flag is set
-  if [ "$PUBLISH" = true ]; then
+  # Submit for review if --submit flag is set
+  if [ "$SUBMIT" = true ]; then
     echo ""
-    echo "Publishing extension..."
-    PUBLISH_RESPONSE=$(curl -s -X POST \
+    echo "Submitting for review..."
+    SUBMIT_RESPONSE=$(curl -s -X POST \
       -H "Authorization: Bearer ${ACCESS_TOKEN}" \
       -H "x-goog-api-version: 2" \
       -H "Content-Length: 0" \
       "https://www.googleapis.com/chromewebstore/v1.1/items/${EXTENSION_ID}/publish")
     
-    PUBLISH_STATUS=$(echo "$PUBLISH_RESPONSE" | jq -r '.status[0]')
+    SUBMIT_STATUS=$(echo "$SUBMIT_RESPONSE" | jq -r '.status[0]')
     
-    if [ "$PUBLISH_STATUS" = "OK" ]; then
-      echo "✓ Extension published successfully!"
+    if [ "$SUBMIT_STATUS" = "OK" ]; then
+      echo "✓ Extension submitted for review!"
     else
-      echo "Publish response:"
-      echo "$PUBLISH_RESPONSE" | jq .
+      echo "Submit response:"
+      echo "$SUBMIT_RESPONSE" | jq .
     fi
   fi
   
   echo ""
   echo "=========================================="
-  echo "✓ Chrome Web Store upload complete!"
+  echo "✓ Chrome Web Store operation complete!"
   echo "=========================================="
 else
   echo "Ready to upload to Chrome Web Store!"
-  echo "Use --upload to upload, --publish to upload and publish"
+  echo "  --draft   Upload as draft (no review)"
+  echo "  --submit  Upload and submit for review"
 fi
