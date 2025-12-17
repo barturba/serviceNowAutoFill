@@ -5,7 +5,7 @@
 window.FormFiller = window.FormFiller || {};
 
 window.FormFiller.processIncidentForm = async function(doc, timeValue, commentText) {
-  console.log('=== PROCESSING INCIDENT FORM ===', doc.location.href);
+  window.DebugLogger.log('=== PROCESSING INCIDENT FORM ===', doc.location.href);
   try {
     const durationSeconds = window.TimeParser.parseDuration(timeValue);
     if (durationSeconds <= 0) throw new Error('Invalid time value: ' + timeValue);
@@ -34,14 +34,10 @@ window.FormFiller.processIncidentForm = async function(doc, timeValue, commentTe
     fieldsToUpdate.push(...(await window.fillWorkNotes(doc, workNotesField, workNotesEditable, workNotesText)));
     fieldsToUpdate.push(...window.fillWorkType(doc, workTypeField));
 
-    fieldsToUpdate.forEach(field => {
-      field.dispatchEvent(new Event('input', { bubbles: true }));
-      field.dispatchEvent(new Event('change', { bubbles: true }));
-      field.dispatchEvent(new Event('blur', { bubbles: true }));
-    });
+    window.dispatchFieldEvents(fieldsToUpdate, ['input', 'change', 'blur']);
 
     return { success: true };
   } catch (error) {
-    return { success: false, error: error.message };
+    return window.ErrorHandler.handleError(error, 'Processing incident form');
   }
 };

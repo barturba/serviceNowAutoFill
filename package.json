@@ -1,6 +1,6 @@
 {
   "name": "servicenow-time-entry-assistant",
-  "version": "2.23",
+  "version": "2.25",
   "description": "ServiceNow Time Entry Assistant - Chrome Extension",
   "scripts": {
     "test": "jest",

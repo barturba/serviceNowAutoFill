@@ -23,4 +23,28 @@ window.FieldFinder.querySelectorFirst = function(doc, selectors) {
   return null;
 };
 
+/**
+ * Generic field finder factory
+ * Creates a field finder function for a specific field name
+ * @param {string} fieldName - Name of the field (e.g., 'assignment_group', 'category')
+ * @param {string[]} selectors - Array of CSS selectors to try
+ * @returns {Function} Async function that finds the field in a document
+ */
+window.FieldFinder.createFieldFinder = function(fieldName, selectors) {
+  return async function(doc) {
+    let field = window.FieldFinder.querySelectorFirst(doc, selectors);
+    if (!field) {
+      window.DebugLogger.log(`Waiting for ${fieldName} field...`);
+      try {
+        field = await window.FieldFinder.waitForElement(doc, selectors.join(', '));
+      } catch (e) {
+        window.DebugLogger.log(`Could not find ${fieldName} field:`, e.message);
+        return null;
+      }
+    }
+    window.DebugLogger.log(`Found ${fieldName}:`, field?.id, 'tag:', field?.tagName, 'type:', field?.type);
+    return field;
+  };
+};
+
 

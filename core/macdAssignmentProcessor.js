@@ -4,7 +4,7 @@
  */
 
 async function processMacdAssignment(doc, agentName) {
-  console.log('Starting MACD assignment process for agent:', agentName);
+  window.DebugLogger.log('Starting MACD assignment process for agent:', agentName);
   const scrollPositions = window.saveScrollPositions(doc);
   const restoreScroll = () => window.restoreScrollPositions(doc, scrollPositions);
 
@@ -20,20 +20,14 @@ async function processMacdAssignment(doc, agentName) {
     await setStateStep(doc, fieldsToUpdate, errors);
 
     // Dispatch final events on all updated fields
-    fieldsToUpdate.forEach(field => window.dispatchFieldEvents(field, ['input', 'change']));
+    window.dispatchFieldEvents(fieldsToUpdate, ['input', 'change']);
     restoreScroll();
     
-    if (errors.length > 0) {
-      console.log('Completed with warnings:', errors.join(', '));
-      return { success: true, warnings: errors };
-    }
-    
-    console.log('✓ MACD assignment completed successfully');
-    return { success: true };
+    window.DebugLogger.log('✓ MACD assignment completed successfully');
+    return window.ErrorHandler.createSuccess(errors.length > 0 ? errors : undefined);
   } catch (error) {
     restoreScroll();
-    console.error('✗ MACD assignment failed:', error);
-    return { success: false, error: error.message };
+    return window.ErrorHandler.handleError(error, 'MACD assignment');
   }
 }
 

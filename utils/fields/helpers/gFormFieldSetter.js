@@ -9,10 +9,10 @@ async function setFieldValueWithGForm(doc, field, fieldName, value) {
       gForm.setValue(fieldName, '');
       await window.delay(100);
       gForm.setValue(fieldName, value);
-      console.log(`✓ Set ${fieldName} to "${value}" using g_form.setValue()`);
+      window.DebugLogger.log(`✓ Set ${fieldName} to "${value}" using g_form.setValue()`);
       dispatchFieldEvents(field, ['input', 'change', 'blur']);
     } catch (e) {
-      console.log(`g_form.setValue failed, using direct field manipulation: ${e.message}`);
+      window.DebugLogger.log(`g_form.setValue failed, using direct field manipulation: ${e.message}`);
       await clearFieldValue(field);
       field.value = value;
       dispatchFieldEvents(field, ['input', 'change', 'blur']);
@@ -25,8 +25,8 @@ async function setFieldValueWithGForm(doc, field, fieldName, value) {
 }
 
 async function setReferenceFieldValue(doc, field, fieldName, value) {
-  console.log(`Setting reference field ${fieldName} to: ${value}`);
-  console.log(`Field details: id=${field.id}, type=${field.type}, current value="${field.value}"`);
+  window.DebugLogger.log(`Setting reference field ${fieldName} to: ${value}`);
+  window.DebugLogger.log(`Field details: id=${field.id}, type=${field.type}, current value="${field.value}"`);
   
   // ServiceNow reference fields have two parts:
   // 1. Display field (sys_display.{table}.{fieldName}) - visible autocomplete input
@@ -42,7 +42,7 @@ async function setReferenceFieldValue(doc, field, fieldName, value) {
   const displayField = doc.getElementById(displayFieldId);
   
   if (displayField) {
-    console.log(`Found display field: ${displayFieldId}`);
+    window.DebugLogger.log(`Found display field: ${displayFieldId}`);
     
     // Clear and set the display field
     displayField.value = '';
@@ -58,16 +58,17 @@ async function setReferenceFieldValue(doc, field, fieldName, value) {
     displayField.dispatchEvent(new Event('keyup', { bubbles: true }));
     
     // Wait for autocomplete to process and populate hidden field
-    await window.delay(800);
+    // TODO: Replace fixed delay with polling for autocomplete completion
+    await window.delay(window.TimingConstants.DELAY_ASSIGNMENT_GROUP_PROCESS);
     
     // Trigger blur to finalize autocomplete selection
     displayField.dispatchEvent(new Event('blur', { bubbles: true }));
     displayField.dispatchEvent(new Event('change', { bubbles: true }));
     
     await window.delay(200);
-    console.log(`✓ Display field set, autocomplete should have populated hidden field`);
+    window.DebugLogger.log(`✓ Display field set, autocomplete should have populated hidden field`);
   } else {
-    console.log(`Display field ${displayFieldId} not found, using fallback`);
+    window.DebugLogger.log(`Display field ${displayFieldId} not found, using fallback`);
   }
   
   // Also use g_form API as fallback/reinforcement

@@ -31,10 +31,17 @@ function setSelectFieldValue(doc, field, fieldName, optionMatcher, fallbackValue
 }
 
 /**
- * Dispatch events on a field element
+ * Dispatch events on a field element or array of field elements
+ * @param {HTMLElement|HTMLElement[]} fields - Single field or array of fields
+ * @param {string[]} eventTypes - Array of event types to dispatch
  */
-function dispatchFieldEvents(field, eventTypes = ['input', 'change']) {
-  eventTypes.forEach(type => field.dispatchEvent(new Event(type, { bubbles: true })));
+function dispatchFieldEvents(fields, eventTypes = ['input', 'change']) {
+  const fieldArray = Array.isArray(fields) ? fields : [fields];
+  fieldArray.forEach(field => {
+    if (field) {
+      eventTypes.forEach(type => field.dispatchEvent(new Event(type, { bubbles: true })));
+    }
+  });
 }
 
 // Make available globally

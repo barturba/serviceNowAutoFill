@@ -25,14 +25,15 @@ async function processAlertCleared(doc) {
     await setResolutionCodeField(doc, fieldsToUpdate);
     await setCloseNotesField(doc, fieldsToUpdate);
 
-    fieldsToUpdate.forEach(field => window.dispatchFieldEvents(field, ['input', 'change']));
+    window.dispatchFieldEvents(fieldsToUpdate, ['input', 'change']);
     restoreScroll();
+    // Delay to allow UI updates to complete before final scroll restoration
     await window.delay(window.TimingConstants.DELAY_ALERT_CLEARED);
     restoreScroll();
-    return { success: true };
+    return window.ErrorHandler.createSuccess();
   } catch (error) {
     restoreScroll();
-    return { success: false, error: error.message };
+    return window.ErrorHandler.handleError(error, 'Alert cleared workflow');
   }
 }
 

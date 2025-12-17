@@ -56,7 +56,7 @@ describe('Reference Field Setter - Code Structure Tests', () => {
   });
 
   test('setReferenceFieldValue must log debug information', () => {
-    expect(gFormFieldSetterCode).toContain('console.log');
+    expect(gFormFieldSetterCode).toContain('DebugLogger.log');
     expect(gFormFieldSetterCode).toContain('Setting reference field');
   });
 

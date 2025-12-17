@@ -19,25 +19,25 @@ function getGForm(doc) {
  */
 function setWorkNotesViaGForm(doc, workNotesText) {
   if (typeof doc.defaultView.g_form !== 'undefined' && doc.defaultView.g_form) {
-    console.log('Found ServiceNow g_form API, checking for existing work_notes content');
+    window.DebugLogger.log('Found ServiceNow g_form API, checking for existing work_notes content');
     try {
       const existingWorkNotes = doc.defaultView.g_form.getValue('work_notes') || '';
-      console.log('Existing work_notes value from g_form:', existingWorkNotes);
+      window.DebugLogger.log('Existing work_notes value from g_form:', existingWorkNotes);
 
       if (!existingWorkNotes) {
         doc.defaultView.g_form.setValue('work_notes', workNotesText);
-        console.log('✓ Set work_notes using g_form.setValue()');
+        window.DebugLogger.log('✓ Set work_notes using g_form.setValue()');
         return true;
       } else {
-        console.log('✓ Preserving existing work_notes content, skipping g_form.setValue()');
+        window.DebugLogger.log('✓ Preserving existing work_notes content, skipping g_form.setValue()');
         return false;
       }
     } catch (e) {
-      console.log('g_form operations failed:', e.message);
+      window.DebugLogger.log('g_form operations failed:', e.message);
       return false;
     }
   } else {
-    console.log('g_form API not available, will use direct field manipulation');
+    window.DebugLogger.log('g_form API not available, will use direct field manipulation');
     return false;
   }
 }
