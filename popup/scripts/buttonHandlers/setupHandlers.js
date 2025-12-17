@@ -10,8 +10,6 @@ function setupButtonHandlers() {
   document.querySelectorAll('.time-btn').forEach(setupTimeButtonHandler);
   document.querySelectorAll('.time-save-btn').forEach(setupTimeSaveButtonHandler);
   document.querySelectorAll('.alert-cleared-btn').forEach(setupAlertClearedButtonHandler);
-  document.querySelectorAll('.macd-assignment-btn').forEach(setupMacdAssignmentButtonHandler);
-  document.querySelectorAll('.open-stale-incidents-btn').forEach(setupOpenStaleIncidentsButtonHandler);
 }
 
 function setupTimeButtonHandler(button) {
@@ -42,35 +40,5 @@ function setupAlertClearedButtonHandler(button) {
       injectAndExecute('processAlertCleared',
         () => window.processAlertCleared?.() || Promise.reject(new Error('processAlertCleared not found')));
     }, button);
-  });
-}
-
-function setupMacdAssignmentButtonHandler(button) {
-  button.addEventListener('click', async () => {
-    await executeWithProgressTracking(async () => {
-      const agentSelect = document.getElementById('taskmaster-agent-input');
-      const agentName = agentSelect ? agentSelect.value.trim() : '';
-      if (!agentName) {
-        showError('Please select an agent');
-        return;
-      }
-      await saveTaskmasterAgent(agentName);
-      injectAndExecute('processMacdAssignment',
-        (n) => window.processMacdAssignment?.(n) || Promise.reject(new Error('processMacdAssignment not found')), [agentName]);
-    }, button);
-  });
-}
-
-function setupOpenStaleIncidentsButtonHandler(button) {
-  button.addEventListener('click', async () => {
-    button.classList.add('loading');
-    button.disabled = true;
-    
-    try {
-      await handleOpenStaleIncidents();
-    } finally {
-      button.classList.remove('loading');
-      button.disabled = false;
-    }
   });
 }

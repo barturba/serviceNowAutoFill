@@ -32,47 +32,6 @@
   <div class="section-divider">
     <button class="alert-cleared-btn full-width-btn" aria-label="Process alert cleared workflow">Alert Cleared</button>
   </div>
-  <div class="section-divider">
-    <h3 class="section-subtitle">MACD Assignment</h3>
-    <div class="macd-form-group">
-      <div class="comments-input-container">
-        <label for="taskmaster-agent-input">Agent</label>
-        <select id="taskmaster-agent-input" aria-label="Agent name">
-          <option value="">Select agent</option>
-          <!-- Populated dynamically -->
-        </select>
-      </div>
-      <button class="macd-assignment-btn full-width-btn" aria-label="Assign to MACD">Assign to MACD</button>
-      <div class="manage-agents-link-container">
-        <button id="manage-agents-btn" class="manage-agents-link" aria-label="Manage agents list">
-          Manage Agents
-        </button>
-      </div>
-    </div>
-    
-    <!-- Agent Management Section -->
-    <div id="agent-management" class="agent-management-section">
-      <h4 class="agent-management-title">Manage Agents</h4>
-      
-      <!-- Add New Agent -->
-      <div class="add-agent-container">
-        <div class="add-agent-input-group">
-          <input type="text" id="new-agent-input" placeholder="Agent name" class="new-agent-input" aria-label="New agent name">
-          <button id="add-agent-btn" class="small-btn" aria-label="Add agent">Add</button>
-        </div>
-      </div>
-      
-      <!-- Agent List -->
-      <div id="agent-list-container" class="agent-list-container">
-        <!-- Populated dynamically -->
-      </div>
-    </div>
-  </div>
-  <div class="section-divider">
-    <h3 class="section-subtitle">Incident Review</h3>
-    <button class="open-stale-incidents-btn full-width-btn" aria-label="Open incidents not updated today">Open Stale Incidents</button>
-    <div id="stale-incidents-progress" class="stale-progress" role="status" aria-live="polite"></div>
-  </div>
   <div id="error-message" class="error-message" role="alert" aria-live="polite"></div>
   <div id="success-message" class="success-message" role="status" aria-live="polite"></div>
   <script src="scripts/constants/coreFiles.js"></script>
@@ -84,31 +43,6 @@
   <script src="scripts/constants/injectFiles.js"></script>
   <script src="scripts/constants.js"></script>
   <script src="scripts/helpers.js"></script>
-  <script src="scripts/storage.js"></script>
-  <script src="scripts/storage/taskmasterAgent.js"></script>
-  <script src="scripts/storage/macdCache.js"></script>
-  <script src="scripts/storage/agentManagement.js"></script>
-  <!-- Agent Manager Modules -->
-  <script src="scripts/agentManager/validation.js"></script>
-  <script src="scripts/agentManager/messages.js"></script>
-  <script src="scripts/agentManager/agentListItem.js"></script>
-  <script src="scripts/agentManager/listRenderer.js"></script>
-  <script src="scripts/agentManager/selection.js"></script>
-  <script src="scripts/agentManager/ui.js"></script>
-  <script src="scripts/agentManager/operations/addAgent.js"></script>
-  <script src="scripts/agentManager/operations/updateAgent.js"></script>
-  <script src="scripts/agentManager/operations/deleteAgent.js"></script>
-  <script src="scripts/agentManager/crud.js"></script>
-  <script src="scripts/agentManager/edit/helpers.js"></script>
-  <script src="scripts/agentManager/edit/handlers.js"></script>
-  <script src="scripts/agentManager/edit.js"></script>
-  <!-- Initialization Modules -->
-  <script src="scripts/initialization/agentSelectPopulator.js"></script>
-  <script src="scripts/initialization/macdAgentLoader.js"></script>
-  <script src="scripts/initialization/agentSetup.js"></script>
-  <script src="scripts/initialization/agentEventHandlers.js"></script>
-  <script src="scripts/initialization/agentInputHandlers.js"></script>
-  <script src="scripts/initialization/eventHandlers.js"></script>
   <script src="scripts/messageHandlers/errorHandlers.js"></script>
   <script src="scripts/messageHandlers/successHandlers.js"></script>
   <script src="scripts/messageHandlers.js"></script>
@@ -116,7 +50,6 @@
   <script src="scripts/injectionHelpers.js"></script>
   <script src="scripts/scriptInjector.js"></script>
   <script src="scripts/buttonHelpers.js"></script>
-  <script src="scripts/staleIncidentOpener.js"></script>
   <script src="scripts/buttonHandlers/setupHandlers.js"></script>
   <script src="scripts/popup.js"></script>
 </body>

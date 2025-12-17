@@ -36,23 +36,12 @@ describe('Button Handler Setup - Critical Regression Tests', () => {
     expect(setupHandlersCode).toMatch(/\.alert-cleared-btn.*forEach.*setupAlertClearedButtonHandler/);
   });
 
-  test('setupButtonHandlers must call setupMacdAssignmentButtonHandler', () => {
-    expect(setupHandlersCode).toContain('setupMacdAssignmentButtonHandler');
-    expect(setupHandlersCode).toMatch(/\.macd-assignment-btn.*forEach.*setupMacdAssignmentButtonHandler/);
-  });
-
-  test('setupButtonHandlers must call setupOpenStaleIncidentsButtonHandler', () => {
-    expect(setupHandlersCode).toContain('setupOpenStaleIncidentsButtonHandler');
-    expect(setupHandlersCode).toMatch(/\.open-stale-incidents-btn.*forEach.*setupOpenStaleIncidentsButtonHandler/);
-  });
 
   test('all individual handler functions must exist', () => {
     const requiredFunctions = [
       'function setupTimeButtonHandler(',
       'function setupTimeSaveButtonHandler(',
-      'function setupAlertClearedButtonHandler(',
-      'function setupMacdAssignmentButtonHandler(',
-      'function setupOpenStaleIncidentsButtonHandler('
+      'function setupAlertClearedButtonHandler('
     ];
 
     requiredFunctions.forEach(funcSignature => {
@@ -67,19 +56,6 @@ describe('Button Handler Setup - Critical Regression Tests', () => {
 
   test('time-save button handlers should call fillTimeInNestedFrameAndSave', () => {
     expect(setupHandlersCode).toContain('fillTimeInNestedFrameAndSave');
-  });
-
-  test('MACD button handler should validate agent selection', () => {
-    expect(setupHandlersCode).toContain('taskmaster-agent-input');
-    expect(setupHandlersCode).toContain('Please select an agent');
-  });
-
-  test('MACD button handler should call processMacdAssignment', () => {
-    expect(setupHandlersCode).toContain('processMacdAssignment');
-  });
-
-  test('MACD button handler should save agent selection', () => {
-    expect(setupHandlersCode).toContain('saveTaskmasterAgent');
   });
 });
 
@@ -122,12 +98,6 @@ describe('HTML Integration', () => {
     expect(popupHtml).toContain('time-btn');
     expect(popupHtml).toContain('time-save-btn');
     expect(popupHtml).toContain('alert-cleared-btn');
-    expect(popupHtml).toContain('macd-assignment-btn');
-    expect(popupHtml).toContain('open-stale-incidents-btn');
-  });
-
-  test('popup.html must have taskmaster agent input', () => {
-    expect(popupHtml).toContain('id="taskmaster-agent-input"');
   });
 
   test('popup.html must have comment input field', () => {

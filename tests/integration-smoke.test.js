@@ -37,18 +37,6 @@ describe('Extension Popup Integration', () => {
     expect(popupHtml).toContain('alert-cleared-btn');
   });
 
-  test('MACD assignment button should exist', () => {
-    expect(popupHtml).toContain('macd-assignment-btn');
-  });
-
-  test('open stale incidents button should exist', () => {
-    expect(popupHtml).toContain('open-stale-incidents-btn');
-  });
-
-  test('agent input dropdown should exist', () => {
-    expect(popupHtml).toContain('id="taskmaster-agent-input"');
-  });
-
   test('comment input field should exist', () => {
     expect(popupHtml).toContain('id="additional-comments-input"');
   });
@@ -107,13 +95,6 @@ describe('Popup.js Integration', () => {
     expect(popupJsCode).toContain('setupButtonHandlers()');
   });
 
-  test('popup.js must initialize agent dropdown', () => {
-    expect(popupJsCode).toContain('initializeAgentDropdown');
-  });
-
-  test('popup.js must setup agent event handlers', () => {
-    expect(popupJsCode).toContain('setupAgentEventHandlers');
-  });
 });
 
 describe('Regression Prevention Tests', () => {
@@ -137,17 +118,13 @@ describe('Regression Prevention Tests', () => {
     expect(setupHandlersCode).toContain("querySelectorAll('.time-btn')");
     expect(setupHandlersCode).toContain("querySelectorAll('.time-save-btn')");
     expect(setupHandlersCode).toContain("querySelectorAll('.alert-cleared-btn')");
-    expect(setupHandlersCode).toContain("querySelectorAll('.macd-assignment-btn')");
-    expect(setupHandlersCode).toContain("querySelectorAll('.open-stale-incidents-btn')");
   });
 
   test('CRITICAL: all individual setup functions must exist', () => {
     const requiredFunctions = [
       'setupTimeButtonHandler',
       'setupTimeSaveButtonHandler',
-      'setupAlertClearedButtonHandler',
-      'setupMacdAssignmentButtonHandler',
-      'setupOpenStaleIncidentsButtonHandler'
+      'setupAlertClearedButtonHandler'
     ];
 
     requiredFunctions.forEach(funcName => {
