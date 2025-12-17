@@ -166,17 +166,10 @@
       return;
     }
     
-    // Find the appropriate place to inject the UI
-    // Look for the form-field-addons div that contains the timer button
-    const addonsContainer = timeWorkedElement.querySelector('.form-field-addons');
-    if (!addonsContainer) {
-      console.log('ServiceNow Time Assistant: Could not find form field addons container');
-      return;
-    }
-    
-    // Create and inject the UI after the addons container
+    // Create and inject the UI at the beginning of the form-group
+    // This will make it appear to the left of the Time Worked label
     const inlineUI = createInlineUI();
-    addonsContainer.parentElement.insertBefore(inlineUI, addonsContainer.nextSibling);
+    timeWorkedElement.insertBefore(inlineUI, timeWorkedElement.firstChild);
     
     setupEventHandlers();
     uiInjected = true;
