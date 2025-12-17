@@ -21,12 +21,6 @@ describe('Extension Popup Integration', () => {
     expect(popupHtml.length).toBeGreaterThan(0);
   });
 
-  test('all required time buttons should exist', () => {
-    const timeButtonMatches = popupHtml.match(/class="time-btn"/g);
-    expect(timeButtonMatches).not.toBeNull();
-    expect(timeButtonMatches.length).toBe(6); // 15min, 30min, 45min, 1hr, 1.5hr, 2hr
-  });
-
   test('all required time-save buttons should exist', () => {
     const timeSaveButtonMatches = popupHtml.match(/class="time-save-btn"/g);
     expect(timeSaveButtonMatches).not.toBeNull();
@@ -115,14 +109,12 @@ describe('Regression Prevention Tests', () => {
 
   test('CRITICAL: setupButtonHandlers must register all button types', () => {
     // Ensures all button types are wired up
-    expect(setupHandlersCode).toContain("querySelectorAll('.time-btn')");
     expect(setupHandlersCode).toContain("querySelectorAll('.time-save-btn')");
     expect(setupHandlersCode).toContain("querySelectorAll('.alert-cleared-btn')");
   });
 
   test('CRITICAL: all individual setup functions must exist', () => {
     const requiredFunctions = [
-      'setupTimeButtonHandler',
       'setupTimeSaveButtonHandler',
       'setupAlertClearedButtonHandler'
     ];

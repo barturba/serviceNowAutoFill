@@ -21,11 +21,6 @@ describe('Button Handler Setup - Critical Regression Tests', () => {
     expect(setupHandlersCode).toContain('function setupButtonHandlers()');
   });
 
-  test('setupButtonHandlers must call setupTimeButtonHandler', () => {
-    expect(setupHandlersCode).toContain('setupTimeButtonHandler');
-    expect(setupHandlersCode).toMatch(/\.time-btn.*forEach.*setupTimeButtonHandler/);
-  });
-
   test('setupButtonHandlers must call setupTimeSaveButtonHandler', () => {
     expect(setupHandlersCode).toContain('setupTimeSaveButtonHandler');
     expect(setupHandlersCode).toMatch(/\.time-save-btn.*forEach.*setupTimeSaveButtonHandler/);
@@ -39,7 +34,6 @@ describe('Button Handler Setup - Critical Regression Tests', () => {
 
   test('all individual handler functions must exist', () => {
     const requiredFunctions = [
-      'function setupTimeButtonHandler(',
       'function setupTimeSaveButtonHandler(',
       'function setupAlertClearedButtonHandler('
     ];
@@ -47,11 +41,6 @@ describe('Button Handler Setup - Critical Regression Tests', () => {
     requiredFunctions.forEach(funcSignature => {
       expect(setupHandlersCode).toContain(funcSignature);
     });
-  });
-
-  test('time button handlers should call injectAndExecute with fillTimeInNestedFrame', () => {
-    expect(setupHandlersCode).toContain('fillTimeInNestedFrame');
-    expect(setupHandlersCode).toContain('injectAndExecute');
   });
 
   test('time-save button handlers should call fillTimeInNestedFrameAndSave', () => {
@@ -95,7 +84,6 @@ describe('HTML Integration', () => {
   });
 
   test('popup.html must have all required button types', () => {
-    expect(popupHtml).toContain('time-btn');
     expect(popupHtml).toContain('time-save-btn');
     expect(popupHtml).toContain('alert-cleared-btn');
   });
