@@ -37,3 +37,4 @@ async function executeWithProgressTracking(operation, button) {
     setTimeout(() => { isOperationInProgress = false; }, 100);
   }
 }
+

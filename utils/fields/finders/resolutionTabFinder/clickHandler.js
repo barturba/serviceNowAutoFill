@@ -17,3 +17,4 @@ async function clickResolutionTab(resolutionTab, doc, restoreScroll) {
   await window.delay(window.TimingConstants.DELAY_TAB_SWITCH_FINAL);
   restoreScroll();
 }
+

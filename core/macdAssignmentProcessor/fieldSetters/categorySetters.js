@@ -43,3 +43,4 @@ async function setSubcategoryField(doc, field) {
   console.log(`✗ Subcategory MACD option not found after ${maxAttempts} attempts`);
   return false;
 }
+

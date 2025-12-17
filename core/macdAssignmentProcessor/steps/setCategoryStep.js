@@ -20,3 +20,4 @@ async function setCategoryStep(doc, fieldsToUpdate, errors) {
     console.log('✗ Category field not found');
   }
 }
+

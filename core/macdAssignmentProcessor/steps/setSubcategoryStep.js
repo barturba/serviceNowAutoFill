@@ -30,3 +30,4 @@ async function setSubcategoryStep(doc, fieldsToUpdate, errors) {
     console.log('✗ Subcategory field not found');
   }
 }
+

@@ -29,3 +29,4 @@ async function setAssignedToField(doc, field, agentName) {
   await window.setReferenceFieldValue(doc, field, 'assigned_to', agentName);
   return true;
 }
+

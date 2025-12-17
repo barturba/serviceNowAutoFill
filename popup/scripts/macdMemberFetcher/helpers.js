@@ -29,3 +29,4 @@ function handleExecutionResults(results, resolve, reject) {
     reject(new Error('Failed to fetch MACD members'));
   }
 }
+

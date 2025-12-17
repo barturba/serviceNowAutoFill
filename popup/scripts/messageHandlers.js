@@ -14,3 +14,4 @@ function clearError() {
   hideError();
   hideSuccess();
 }
+

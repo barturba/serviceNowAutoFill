@@ -19,3 +19,4 @@ const FINDER_FILES = [
   'utils/fields/finders/assignmentGroupFinder.js',
   'utils/fields/finders/assignedToFinder.js'
 ];
+

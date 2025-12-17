@@ -46,3 +46,4 @@ function validateMacdAssignment() {
   validateFormFiller('processMacdAssignment');
   validateIframeFinder();
 }
+

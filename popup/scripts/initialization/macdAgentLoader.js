@@ -23,3 +23,4 @@ async function loadMacdAgents() {
     await saveMacdAgentsCache(defaultAgents);
   }
 }
+

@@ -24,3 +24,4 @@ function hideSuccess() {
     setTimeout(() => { successElement.style.display = 'none'; }, 300);
   }
 }
+

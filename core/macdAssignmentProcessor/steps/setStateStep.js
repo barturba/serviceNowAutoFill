@@ -20,3 +20,4 @@ async function setStateStep(doc, fieldsToUpdate, errors) {
     console.log('✗ State field not found');
   }
 }
+

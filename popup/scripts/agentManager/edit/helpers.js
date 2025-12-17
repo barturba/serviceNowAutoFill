@@ -27,3 +27,4 @@ function restoreAgentNameSpan(currentName, index, input, parent) {
   const span = createAgentNameSpan(currentName, index);
   parent.replaceChild(span, input);
 }
+

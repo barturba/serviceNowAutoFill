@@ -38,3 +38,4 @@ function createCancelEditHandler(currentName, index, input, parent) {
     restoreAgentNameSpan(currentName, index, input, parent);
   };
 }
+

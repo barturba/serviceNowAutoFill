@@ -24,3 +24,4 @@ async function resolveDocument() {
   console.log('✓ Found iframe:', iframe);
   return await window.IframeFinder.waitForIframeLoad(iframe);
 }
+

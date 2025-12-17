@@ -44,3 +44,4 @@ function isMacdAgentsCacheExpired(timestamp) {
   const expiryMs = CACHE_EXPIRY_HOURS * 60 * 60 * 1000;
   return (now - timestamp) > expiryMs;
 }
+

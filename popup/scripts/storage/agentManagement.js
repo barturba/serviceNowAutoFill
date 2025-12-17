@@ -36,3 +36,4 @@ async function removeAgentFromStorage(name) {
   const filteredAgents = agents.filter(agent => agent.toLowerCase() !== name.toLowerCase());
   await saveMacdAgentsCache(filteredAgents);
 }
+

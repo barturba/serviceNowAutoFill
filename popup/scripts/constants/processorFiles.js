@@ -21,3 +21,4 @@ const PROCESSOR_FILES = [
   'core/macdAssignmentProcessor/steps.js',
   'core/macdAssignmentProcessor.js'
 ];
+

@@ -25,3 +25,4 @@ function hideError() {
     setTimeout(() => { errorElement.style.display = 'none'; }, 300);
   }
 }
+

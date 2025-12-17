@@ -23,3 +23,4 @@ async function setAssignmentGroupStep(doc, fieldsToUpdate, errors) {
     console.log('✗ Assignment Group field not found');
   }
 }
+

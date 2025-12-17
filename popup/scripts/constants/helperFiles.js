@@ -12,3 +12,4 @@ const HELPER_FILES = [
   'utils/dom/scrollManager.js',
   'utils/fields/fillers/timeFiller.js'
 ];
+

@@ -39,3 +39,4 @@ async function deleteAgent(name) {
   showAgentSuccess('Agent deleted successfully');
   return true;
 }
+

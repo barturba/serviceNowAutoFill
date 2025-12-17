@@ -6,3 +6,4 @@ const INJECT_FILES = [
   'content/inject/validationExecutor.js',
   'content/inject.js'
 ];
+

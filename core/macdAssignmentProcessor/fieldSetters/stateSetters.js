@@ -16,3 +16,4 @@ function setStateField(doc, field) {
   window.dispatchFieldEvents(field, ['input', 'change']);
   return true;
 }
+

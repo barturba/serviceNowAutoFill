@@ -19,3 +19,4 @@ async function loadTaskmasterAgent() {
   const result = await getStorageData([STORAGE_KEY_TASKMASTER_AGENT]);
   return result[STORAGE_KEY_TASKMASTER_AGENT] || null;
 }
+

@@ -25,3 +25,4 @@ function handleExecutionResult(result) {
     showError('Failed: ' + (result?.error || 'Unknown error'));
   }
 }
+

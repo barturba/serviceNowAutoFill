@@ -41,3 +41,4 @@ async function setCloseNotesField(doc, fieldsToUpdate) {
     fieldsToUpdate.push(closeNotesField);
   }
 }
+

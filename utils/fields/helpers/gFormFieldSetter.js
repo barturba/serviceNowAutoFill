@@ -36,3 +36,4 @@ async function setReferenceFieldValue(doc, field, fieldName, value) {
 // Make available globally
 window.setFieldValueWithGForm = setFieldValueWithGForm;
 window.setReferenceFieldValue = setReferenceFieldValue;
+

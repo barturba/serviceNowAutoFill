@@ -33,3 +33,4 @@ async function addAgent(name) {
   showAgentSuccess('Agent added successfully');
   return true;
 }
+

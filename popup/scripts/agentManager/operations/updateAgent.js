@@ -45,3 +45,4 @@ async function updateAgent(oldName, newName) {
   showAgentSuccess('Agent updated successfully');
   return true;
 }
+
