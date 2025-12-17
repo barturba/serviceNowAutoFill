@@ -16,23 +16,7 @@ async function fillWorkNotes(doc, workNotesField, workNotesEditable, workNotesTe
   const finalWorkNotesText = existingContent || workNotesText;
   window.setWorkNotesViaAngular(doc, workNotesField, finalWorkNotesText);
 
-  workNotesField.click();
-  workNotesField.focus();
-  await window.delay(window.TimingConstants.DELAY_FIELD_FOCUS);
-
-  // Set field value directly (execCommand is deprecated, but preserve select() behavior for ServiceNow compatibility)
-  if (!existingContent) {
-    try {
-      workNotesField.select();
-    } catch (e) {
-      // select() may fail on some field types, continue anyway
-    }
-  }
-  workNotesField.value = existingContent || finalWorkNotesText;
-  ['click', 'focus', 'keydown', 'keypress', 'input', 'keyup', 'change', 'blur'].forEach(type => {
-    workNotesField.dispatchEvent(new Event(type, { bubbles: true, cancelable: true }));
-  });
-  workNotesField.dispatchEvent(new InputEvent('input', { bubbles: true, cancelable: true, inputType: 'insertText', data: finalWorkNotesText }));
+  await window.manipulateWorkNotesField(workNotesField, existingContent, finalWorkNotesText);
   fieldsToUpdate.push(workNotesField);
 
   if (workNotesEditable) {
@@ -44,6 +28,4 @@ async function fillWorkNotes(doc, workNotesField, workNotesEditable, workNotesTe
   return fieldsToUpdate;
 }
 
-// Make available globally
 window.fillWorkNotes = fillWorkNotes;
-

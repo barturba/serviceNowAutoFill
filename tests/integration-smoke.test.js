@@ -130,7 +130,7 @@ describe('Reference Field Fix Verification', () => {
 
   beforeAll(() => {
     gFormFieldSetterCode = fs.readFileSync(
-      path.join(__dirname, '../utils/fields/helpers/gFormFieldSetter.js'),
+      path.join(__dirname, '../utils/fields/helpers/gFormFieldSetter/referenceFieldSetter.js'),
       'utf8'
     );
   });

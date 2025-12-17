@@ -6,8 +6,11 @@ const PROCESSOR_FILES = [
   'utils/dom/injectValidator/validators.js',
   'utils/dom/injectValidator/documentResolver.js',
   'utils/dom/injectValidator.js',
+  'core/formFiller/fieldCollector.js',
+  'core/formFiller/timeCalculator.js',
   'core/formFiller.js',
   'core/alertClearedProcessor/fieldSetters.js',
+  'core/alertClearedProcessor/fieldOperations.js',
   'core/alertClearedProcessor.js',
   'core/macdAssignmentProcessor/fieldSetters/categorySetters.js',
   'core/macdAssignmentProcessor/fieldSetters/assignmentSetters.js',
@@ -21,4 +24,5 @@ const PROCESSOR_FILES = [
   'core/macdAssignmentProcessor/steps.js',
   'core/macdAssignmentProcessor.js'
 ];
+
 

@@ -10,32 +10,36 @@ window.FormFiller.processIncidentForm = async function(doc, timeValue, commentTe
     const durationSeconds = window.TimeParser.parseDuration(timeValue);
     if (durationSeconds <= 0) throw new Error('Invalid time value: ' + timeValue);
 
-    const timeFields = await window.FieldFinder.findTimeWorkedFields(doc);
-    const startField = await window.FieldFinder.findWorkStartField(doc);
-    const endField = await window.FieldFinder.findWorkEndField(doc);
-    const { field: workNotesField, editable: workNotesEditable } = await window.FieldFinder.findWorkNotesField(doc);
-    const workTypeField = await window.FieldFinder.findWorkTypeField(doc);
+    const fields = await window.collectFormFields(doc);
+    const { hours, mins, secs } = window.calculateTimeComponents(durationSeconds);
+    const { now, startTime } = window.calculateTimeWindow(durationSeconds);
+    
+    fields.timeFields.hourInput.value = hours;
+    fields.timeFields.minInput.value = mins;
+    fields.timeFields.secInput.value = secs;
+    fields.timeFields.hiddenTime.value = `${hours}:${mins}:${secs}`;
 
-    const hours = Math.floor(durationSeconds / 3600).toString().padStart(2, '0');
-    const mins = Math.floor((durationSeconds % 3600) / 60).toString().padStart(2, '0');
-    timeFields.hourInput.value = hours;
-    timeFields.minInput.value = mins;
-    timeFields.secInput.value = '00';
-    timeFields.hiddenTime.value = `${hours}:${mins}:00`;
+    const fieldsToUpdate = [
+      fields.timeFields.hourInput, fields.timeFields.minInput, 
+      fields.timeFields.secInput, fields.timeFields.hiddenTime
+    ];
 
-    const now = new Date();
-    const startTime = new Date(now.getTime() - durationSeconds * 1000);
-    const fieldsToUpdate = [timeFields.hourInput, timeFields.minInput, timeFields.secInput, timeFields.hiddenTime];
+    if (fields.startField) {
+      fields.startField.value = window.TimeParser.formatDate(startTime);
+      fieldsToUpdate.push(fields.startField);
+    }
+    if (fields.endField) {
+      fields.endField.value = window.TimeParser.formatDate(now);
+      fieldsToUpdate.push(fields.endField);
+    }
 
-    if (startField) { startField.value = window.TimeParser.formatDate(startTime); fieldsToUpdate.push(startField); }
-    if (endField) { endField.value = window.TimeParser.formatDate(now); fieldsToUpdate.push(endField); }
-
-    const workNotesText = (commentText && commentText.trim()) ? commentText.trim() : window.getLastWorkNote(doc);
-    fieldsToUpdate.push(...(await window.fillWorkNotes(doc, workNotesField, workNotesEditable, workNotesText)));
-    fieldsToUpdate.push(...window.fillWorkType(doc, workTypeField));
+    const workNotesText = (commentText?.trim()) || window.getLastWorkNote(doc);
+    fieldsToUpdate.push(...(await window.fillWorkNotes(
+      doc, fields.workNotesField, fields.workNotesEditable, workNotesText
+    )));
+    fieldsToUpdate.push(...window.fillWorkType(doc, fields.workTypeField));
 
     window.dispatchFieldEvents(fieldsToUpdate, ['input', 'change', 'blur']);
-
     return { success: true };
   } catch (error) {
     return window.ErrorHandler.handleError(error, 'Processing incident form');
