@@ -4,33 +4,34 @@
  */
 
 .sn-time-assistant-container {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 6px;
-  margin-right: 15px;
-  margin-bottom: 6px;
-  padding: 0;
-  background: transparent;
-  border: none;
+  gap: 8px;
+  margin: 0 0 10px 0;
+  padding: 8px 12px;
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 3px;
   font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 13px;
-  width: auto;
-  float: left;
-  clear: both;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .sn-time-assistant-input {
-  padding: 5px 8px;
+  padding: 6px 10px;
   border: 1px solid #ccc;
-  border-radius: 2px;
-  font-size: 12px;
-  width: 130px;
-  height: 30px;
+  border-radius: 3px;
+  font-size: 13px;
+  flex: 1;
+  max-width: 250px;
+  height: 32px;
   outline: none;
-  transition: border-color 0.15s ease-in-out;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   background: #fff;
   color: #333;
   line-height: 1.42857143;
+  box-sizing: border-box;
 }
 
 .sn-time-assistant-input:focus {
@@ -45,20 +46,22 @@
 }
 
 .sn-time-assistant-btn {
-  padding: 5px 12px;
+  padding: 6px 16px;
   background: #5bc0de;
   color: #fff;
-  border: 1px solid transparent;
-  border-radius: 2px;
+  border: 1px solid #46b8da;
+  border-radius: 3px;
   cursor: pointer;
-  font-size: 13px;
-  font-weight: 400;
+  font-size: 14px;
+  font-weight: 600;
   line-height: 1.42857143;
   text-align: center;
   white-space: nowrap;
   vertical-align: middle;
   transition: all 0.2s ease-in-out;
-  height: 30px;
+  height: 32px;
+  box-sizing: border-box;
+  min-width: 80px;
 }
 
 .sn-time-assistant-btn:hover {
@@ -104,17 +107,19 @@
 }
 
 .sn-time-assistant-dropdown {
-  padding: 5px 8px;
+  padding: 6px 10px;
   border: 1px solid #ccc;
-  border-radius: 2px;
-  font-size: 12px;
+  border-radius: 3px;
+  font-size: 13px;
   background: #fff;
   color: #333;
   cursor: pointer;
   outline: none;
-  transition: border-color 0.15s ease-in-out;
-  height: 30px;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  height: 32px;
   line-height: 1.42857143;
+  box-sizing: border-box;
+  min-width: 120px;
 }
 
 .sn-time-assistant-dropdown:hover {
@@ -168,11 +173,18 @@
 @media (max-width: 768px) {
   .sn-time-assistant-container {
     flex-wrap: wrap;
-    gap: 4px;
+    gap: 6px;
+    padding: 8px;
   }
   
   .sn-time-assistant-input {
-    width: 110px;
+    flex: 1 1 100%;
+    max-width: none;
+  }
+  
+  .sn-time-assistant-btn,
+  .sn-time-assistant-dropdown {
+    flex: 1;
   }
 }
 
