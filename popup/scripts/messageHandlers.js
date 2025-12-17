@@ -11,7 +11,14 @@ function createDismissButton(onClick) {
 }
 
 function clearError() {
-  hideError();
-  hideSuccess();
+  // hideError and hideSuccess are defined in separate handler files
+  // that are loaded before this file (see popup.html)
+  if (typeof hideError === 'function') {
+    hideError();
+  }
+  if (typeof hideSuccess === 'function') {
+    hideSuccess();
+  }
 }
+
 
