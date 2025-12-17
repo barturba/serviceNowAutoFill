@@ -7,20 +7,8 @@
  * This orchestrator function registers event listeners for all button types
  */
 function setupButtonHandlers() {
-  document.querySelectorAll('.time-btn').forEach(setupTimeButtonHandler);
   document.querySelectorAll('.time-save-btn').forEach(setupTimeSaveButtonHandler);
   document.querySelectorAll('.alert-cleared-btn').forEach(setupAlertClearedButtonHandler);
-}
-
-function setupTimeButtonHandler(button) {
-  button.addEventListener('click', () => {
-    executeWithProgressTracking(() => {
-      injectAndExecute('fillTimeInNestedFrame', 
-        (tv, ct) => window.fillTimeInNestedFrame?.(tv, ct) || 
-          Promise.reject(new Error('fillTimeInNestedFrame not found')),
-        [button.getAttribute('data-time'), getCommentText()]);
-    }, button);
-  });
 }
 
 function setupTimeSaveButtonHandler(button) {
