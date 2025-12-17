@@ -4,62 +4,71 @@
  */
 
 .sn-time-assistant-container {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  margin-right: 12px;
-  margin-bottom: 8px;
-  padding: 6px 10px;
-  background: #f8f9fa;
-  border: 1px solid #dee2e6;
-  border-radius: 4px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  gap: 6px;
+  margin-right: 15px;
+  margin-bottom: 6px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 13px;
-  width: fit-content;
+  width: auto;
   float: left;
   clear: both;
 }
 
 .sn-time-assistant-input {
-  padding: 4px 8px;
-  border: 1px solid #ced4da;
-  border-radius: 3px;
+  padding: 5px 8px;
+  border: 1px solid #ccc;
+  border-radius: 2px;
   font-size: 12px;
-  width: 140px;
+  width: 130px;
+  height: 30px;
   outline: none;
   transition: border-color 0.15s ease-in-out;
+  background: #fff;
+  color: #333;
+  line-height: 1.42857143;
 }
 
 .sn-time-assistant-input:focus {
-  border-color: #80bdff;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  border-color: #66afe9;
+  outline: 0;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
 }
 
 .sn-time-assistant-input::placeholder {
   color: #999;
-  font-style: italic;
+  font-style: normal;
 }
 
 .sn-time-assistant-btn {
-  padding: 6px 14px;
-  background: #28a745;
-  color: white;
-  border: none;
-  border-radius: 3px;
+  padding: 5px 12px;
+  background: #5bc0de;
+  color: #fff;
+  border: 1px solid transparent;
+  border-radius: 2px;
   cursor: pointer;
   font-size: 13px;
-  font-weight: 500;
-  transition: background 0.2s, transform 0.1s;
+  font-weight: 400;
+  line-height: 1.42857143;
+  text-align: center;
   white-space: nowrap;
+  vertical-align: middle;
+  transition: all 0.2s ease-in-out;
+  height: 30px;
 }
 
 .sn-time-assistant-btn:hover {
-  background: #218838;
+  background: #31b0d5;
+  border-color: #269abc;
 }
 
 .sn-time-assistant-btn:active {
-  background: #1e7e34;
-  transform: scale(0.98);
+  background: #269abc;
+  box-shadow: inset 0 3px 5px rgba(0,0,0,.125);
 }
 
 .sn-time-assistant-btn:disabled {
@@ -95,48 +104,53 @@
 }
 
 .sn-time-assistant-dropdown {
-  padding: 5px 10px;
-  border: 1px solid #ced4da;
-  border-radius: 3px;
+  padding: 5px 8px;
+  border: 1px solid #ccc;
+  border-radius: 2px;
   font-size: 12px;
-  background: white;
+  background: #fff;
+  color: #333;
   cursor: pointer;
   outline: none;
   transition: border-color 0.15s ease-in-out;
+  height: 30px;
+  line-height: 1.42857143;
 }
 
 .sn-time-assistant-dropdown:hover {
-  border-color: #80bdff;
+  border-color: #66afe9;
 }
 
 .sn-time-assistant-dropdown:focus {
-  border-color: #80bdff;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  border-color: #66afe9;
+  outline: 0;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
 }
 
 .sn-time-assistant-message {
   position: fixed;
   top: 20px;
   right: 20px;
-  padding: 12px 20px;
+  padding: 15px 20px;
   border-radius: 4px;
   font-size: 13px;
   z-index: 10000;
   animation: sn-time-assistant-slideIn 0.3s ease-out;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   max-width: 400px;
+  font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 .sn-time-assistant-message.success {
-  background: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
+  background: #dff0d8;
+  color: #3c763d;
+  border: 1px solid #d6e9c6;
 }
 
 .sn-time-assistant-message.error {
-  background: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
+  background: #f2dede;
+  color: #a94442;
+  border: 1px solid #ebccd1;
 }
 
 @keyframes sn-time-assistant-slideIn {
@@ -154,11 +168,19 @@
 @media (max-width: 768px) {
   .sn-time-assistant-container {
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 4px;
   }
   
   .sn-time-assistant-input {
-    width: 120px;
+    width: 110px;
   }
+}
+
+/* Match ServiceNow button focus styles */
+.sn-time-assistant-btn:focus,
+.sn-time-assistant-dropdown:focus {
+  outline: thin dotted;
+  outline: 5px auto -webkit-focus-ring-color;
+  outline-offset: -2px;
 }
 
