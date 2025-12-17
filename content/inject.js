@@ -10,14 +10,6 @@ async function fillTimeInNestedFrame(timeValue, commentText) {
   );
 }
 
-async function processAlertCleared() {
-  window.DebugLogger.log('Starting processAlertCleared...', window.location.href);
-  return executeWithValidation(
-    validateAlertCleared,
-    (doc) => window.FormFiller.processAlertCleared(doc)
-  );
-}
-
 async function fillTimeInNestedFrameAndSave(timeValue, commentText) {
   window.DebugLogger.log('Starting fillTimeInNestedFrameAndSave...', window.location.href);
   const fillResult = await fillTimeInNestedFrame(timeValue, commentText);
@@ -27,5 +19,4 @@ async function fillTimeInNestedFrameAndSave(timeValue, commentText) {
 }
 
 window.fillTimeInNestedFrame = fillTimeInNestedFrame;
-window.processAlertCleared = processAlertCleared;
 window.fillTimeInNestedFrameAndSave = fillTimeInNestedFrameAndSave;

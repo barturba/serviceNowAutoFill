@@ -32,18 +32,11 @@ function validateFormProcessing() {
 }
 
 /**
- * Validate alert cleared dependencies
- */
-function validateAlertCleared() {
-  validateFormFiller('processAlertCleared');
-  validateIframeFinder();
-}
-
-/**
  * Validate MACD assignment dependencies
  */
 function validateMacdAssignment() {
   validateFormFiller('processMacdAssignment');
   validateIframeFinder();
 }
+
 
