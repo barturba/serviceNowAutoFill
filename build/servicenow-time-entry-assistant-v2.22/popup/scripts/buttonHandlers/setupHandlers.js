@@ -2,18 +2,6 @@
  * Button handler setup functions
  */
 
-/**
- * Setup all button handlers for time entry and workflows
- * This orchestrator function registers event listeners for all button types
- */
-function setupButtonHandlers() {
-  document.querySelectorAll('.time-btn').forEach(setupTimeButtonHandler);
-  document.querySelectorAll('.time-save-btn').forEach(setupTimeSaveButtonHandler);
-  document.querySelectorAll('.alert-cleared-btn').forEach(setupAlertClearedButtonHandler);
-  document.querySelectorAll('.macd-assignment-btn').forEach(setupMacdAssignmentButtonHandler);
-  document.querySelectorAll('.open-stale-incidents-btn').forEach(setupOpenStaleIncidentsButtonHandler);
-}
-
 function setupTimeButtonHandler(button) {
   button.addEventListener('click', () => {
     executeWithProgressTracking(() => {
@@ -74,3 +62,4 @@ function setupOpenStaleIncidentsButtonHandler(button) {
     }
   });
 }
+

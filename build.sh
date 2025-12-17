@@ -29,6 +29,22 @@ ZIP_NAME="${EXTENSION_NAME}-v${VERSION}.zip"
 
 echo "Building ${EXTENSION_NAME} v${VERSION}..."
 
+# Run tests before building (if npm is available and node_modules exists)
+if command -v npm &> /dev/null && [ -d "node_modules" ]; then
+  echo "Running tests..."
+  npm test
+  if [ $? -ne 0 ]; then
+    echo "✗ Tests failed! Aborting build."
+    exit 1
+  fi
+  echo "✓ All tests passed"
+  echo ""
+else
+  echo "⚠ Skipping tests (npm not installed or dependencies not installed)"
+  echo "  Run 'npm install' to enable test verification"
+  echo ""
+fi
+
 # Create build directory if it doesn't exist
 mkdir -p "$BUILD_DIR"
 

@@ -1,15 +1,4 @@
-# Build directory
-build/
-
-# Screenshots
-screenshots/
-
-# macOS
+node_modules/
+coverage/
+*.zip
 .DS_Store
-
-# Editor files
-.vscode/
-.idea/
-*.swp
-*.swo
-*~

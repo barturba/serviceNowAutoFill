@@ -1,0 +1,26 @@
+#!/bin/bash
+# Pre-commit hook to run tests before allowing commit
+# Install: ln -s ../../.githooks/pre-commit .git/hooks/pre-commit
+
+echo "Running pre-commit tests..."
+
+# Check if node_modules exists
+if [ ! -d "node_modules" ]; then
+  echo "⚠ Warning: node_modules not found. Run 'npm install' to enable tests."
+  echo "Skipping tests..."
+  exit 0
+fi
+
+# Run tests
+npm test -- --passWithNoTests
+
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "✗ Tests failed! Commit aborted."
+  echo "Fix the failing tests or skip with: git commit --no-verify"
+  exit 1
+fi
+
+echo "✓ All tests passed!"
+exit 0
+
