@@ -3,8 +3,8 @@ describe('Button Handler Setup - Critical Regression Tests', () => {
   let setupHandlersCode;
   beforeAll(() => { setupHandlersCode = fs.readFileSync(path.join(__dirname, '../popup/scripts/buttonHandlers/setupHandlers.js'), 'utf8'); });
   test('CRITICAL: setupButtonHandlers function must exist in source code', () => { expect(setupHandlersCode).toContain('function setupButtonHandlers()'); });
-  test('setupButtonHandlers must call setupTimeSaveButtonHandler', () => { expect(setupHandlersCode).toContain('setupTimeSaveButtonHandler'); expect(setupHandlersCode).toMatch(/\\.time-save-btn[\\s\\S]*forEach[\\s\\S]*setupTimeSaveButtonHandler/); });
-  test('setupButtonHandlers must call setupAlertClearedButtonHandler', () => { expect(setupHandlersCode).toContain('setupAlertClearedButtonHandler'); expect(setupHandlersCode).toMatch(/\\.alert-cleared-btn[\\s\\S]*forEach[\\s\\S]*setupAlertClearedButtonHandler/); });
+  test('setupButtonHandlers must call setupTimeSaveButtonHandler', () => { expect(setupHandlersCode).toContain("document.querySelectorAll('.time-save-btn').forEach(setupTimeSaveButtonHandler);"); });
+  test('setupButtonHandlers must call setupAlertClearedButtonHandler', () => { expect(setupHandlersCode).toContain("document.querySelectorAll('.alert-cleared-btn').forEach(setupAlertClearedButtonHandler);"); });
   test('all individual handler functions must exist', () => { ['function setupTimeSaveButtonHandler(', 'function setupAlertClearedButtonHandler('].forEach(sig => expect(setupHandlersCode).toContain(sig)); });
   test('time-save button handlers should call fillTimeInNestedFrameAndSave', () => { expect(setupHandlersCode).toContain('fillTimeInNestedFrameAndSave'); });
 });

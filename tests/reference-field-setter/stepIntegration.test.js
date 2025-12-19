@@ -12,6 +12,6 @@ describe('MACD Assignment Step Integration', () => {
   test('setAssignedToStep must find assigned to field', () => { expect(setAssignedToStepCode).toContain('findAssignedToField'); });
   test('setAssignedToStep must call setAssignedToField with agent name', () => { expect(setAssignedToStepCode).toContain('setAssignedToField'); expect(setAssignedToStepCode).toContain('agentName'); });
   test('setAssignedToField must pass agent name parameter', () => { expect(assignmentSettersCode).toContain('agentName'); });
-  test('setAssignedToField must validate inputs', () => { expect(assignmentSettersCode).toMatch(/if\\s*\\(\\s*!field/); expect(assignmentSettersCode).toMatch(/if\\s*\\(\\s*!field\\s*\\|\\|\\s*!agentName/); });
+  test('setAssignedToField must validate inputs', () => { expect(assignmentSettersCode).toContain('if (!field'); expect(assignmentSettersCode).toContain('if (!field || !agentName'); });
   test('setAssignedToStep must handle errors gracefully', () => { expect(setAssignedToStepCode).toContain('errors'); expect(setAssignedToStepCode).toContain('Assigned To field not found'); expect(setAssignedToStepCode).toContain('Agent name not provided'); });
 });
