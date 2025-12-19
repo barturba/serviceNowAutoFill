@@ -10,7 +10,13 @@
   const TIME_WORKED_SELECTORS = [
     '#element\\.incident\\.time_worked',
     '#element\\.sc_task\\.time_worked',
-    '[id^="element."][id$=".time_worked"]'
+    '[id^="element."][id$=".time_worked"]',
+    'input[id$=".time_worked"]',
+    'input[name$=".time_worked"]',
+    'input[id*="time_worked"]',
+    'input[name*="time_worked"]',
+    '[data-type="timer"]',
+    '.glide_timer'
   ];
   const RETRY_DELAY = 500;
   const MAX_RETRIES = 20;
@@ -30,18 +36,20 @@
   const TASK_TARGET = 'sc_task';
   const MACD_CHECK_DEBOUNCE = 300;
   const STYLE_ID = 'sn-time-assistant-styles';
+  const MAIN_IFRAME_SELECTOR = '#gsft_main, iframe#gsft_main, iframe[name="gsft_main"]';
 
   let uiInjected = false;
   let macdButtonInjected = false;
   let macdCheckTimer = null;
+  let trackedFrame = null;
 
   /**
    * Wait for the Time Worked field to be available
    */
   async function waitForTimeWorkedField(retries = 0) {
-    const element = findTimeWorkedElement();
-    if (element) {
-      return element;
+    const result = findTimeWorkedElement();
+    if (result) {
+      return result;
     }
 
     if (retries >= MAX_RETRIES) {
@@ -53,17 +61,47 @@
     return waitForTimeWorkedField(retries + 1);
   }
 
-  function findTimeWorkedElement() {
-    for (const selector of TIME_WORKED_SELECTORS) {
-      const el = document.querySelector(selector);
-      if (el) return el;
+  function getDocumentContexts() {
+    const contexts = [document];
+    const iframe = document.querySelector(MAIN_IFRAME_SELECTOR);
+    if (iframe && iframe.contentDocument) {
+      contexts.push(iframe.contentDocument);
     }
+    return contexts;
+  }
 
-    // fallback: locate by label text
-    const labels = Array.from(document.querySelectorAll('label'));
-    const label = labels.find(l => (l.textContent || '').trim().toLowerCase().includes('time worked'));
-    if (label) {
-      return label.closest('.form-group') || label.parentElement;
+  function attachFrameLoadHandler() {
+    const frame = document.querySelector(MAIN_IFRAME_SELECTOR);
+    if (!frame || frame === trackedFrame) return;
+    trackedFrame = frame;
+    frame.addEventListener('load', () => {
+      uiInjected = false;
+      debouncedMacdCheck();
+      // Give the frame a brief moment to render before searching
+      setTimeout(() => {
+        injectUI();
+      }, 200);
+    });
+  }
+
+  function findTimeWorkedElement() {
+    const contexts = getDocumentContexts();
+
+    for (const ctx of contexts) {
+      for (const selector of TIME_WORKED_SELECTORS) {
+        const el = ctx.querySelector(selector);
+        if (el) {
+          const container = el.closest('.form-group') || el.parentElement;
+          return { element: container || el, doc: ctx };
+        }
+      }
+
+      const labels = Array.from(ctx.querySelectorAll('label'));
+      const label = labels.find(l => (l.textContent || '').trim().toLowerCase().includes('time worked'));
+      if (label) {
+        const container = label.closest('.form-group') || label.parentElement;
+        if (container) return { element: container, doc: ctx };
+      }
     }
 
     return null;
@@ -72,8 +110,8 @@
   /**
    * Create the inline UI element
    */
-  function createInlineUI() {
-    const container = document.createElement('div');
+  function createInlineUI(doc) {
+    const container = doc.createElement('div');
     container.className = 'sn-time-assistant-container';
     container.innerHTML = `
       <input 
@@ -107,9 +145,10 @@
   /**
    * Ensure assistant styles are available
    */
-  function ensureStyles() {
-    if (document.getElementById(STYLE_ID)) return;
-    const style = document.createElement('style');
+  function ensureStyles(doc) {
+    const targetDoc = doc || document;
+    if (targetDoc.getElementById(STYLE_ID)) return;
+    const style = targetDoc.createElement('style');
     style.id = STYLE_ID;
     style.textContent = `
       .sn-time-assistant-container {
@@ -147,17 +186,17 @@
         min-width: 140px;
       }
     `;
-    document.head.appendChild(style);
+    (targetDoc.head || document.head).appendChild(style);
   }
 
   /**
    * Show a temporary message
    */
-  function showMessage(message, type = 'success') {
-    const messageEl = document.createElement('div');
+  function showMessage(message, type = 'success', doc = document) {
+    const messageEl = doc.createElement('div');
     messageEl.className = `sn-time-assistant-message ${type}`;
     messageEl.textContent = message;
-    document.body.appendChild(messageEl);
+    (doc.body || document.body).appendChild(messageEl);
     
     setTimeout(() => {
       messageEl.remove();
@@ -167,8 +206,8 @@
   /**
    * Handle time entry action
    */
-  async function handleTimeEntry(timeValue, button) {
-    const commentsInput = document.getElementById('sn-time-assistant-comments');
+  async function handleTimeEntry(timeValue, button, doc = document) {
+    const commentsInput = doc.getElementById('sn-time-assistant-comments');
     const commentText = commentsInput?.value || '';
     
     // Show loading state
@@ -184,17 +223,17 @@
       const result = await window.fillTimeInNestedFrameAndSave(timeValue, commentText);
       
       if (result.success) {
-        showMessage(`✓ Time entry saved: ${timeValue}`, 'success');
+        showMessage(`✓ Time entry saved: ${timeValue}`, 'success', doc);
         // Clear the comments field on success
         if (commentsInput) {
           commentsInput.value = '';
         }
       } else {
-        showMessage(`✗ Error: ${result.error || 'Unknown error'}`, 'error');
+        showMessage(`✗ Error: ${result.error || 'Unknown error'}`, 'error', doc);
       }
     } catch (error) {
       console.error('ServiceNow Time Assistant error:', error);
-      showMessage(`✗ Error: ${error.message}`, 'error');
+      showMessage(`✗ Error: ${error.message}`, 'error', doc);
     } finally {
       // Remove loading state
       button.classList.remove('loading');
@@ -205,13 +244,13 @@
   /**
    * Setup event handlers
    */
-  function setupEventHandlers() {
-    const btn15min = document.getElementById('sn-time-assistant-15min');
-    const dropdownMore = document.getElementById('sn-time-assistant-more');
+  function setupEventHandlers(doc) {
+    const btn15min = doc.getElementById('sn-time-assistant-15min');
+    const dropdownMore = doc.getElementById('sn-time-assistant-more');
     
     if (btn15min) {
       btn15min.addEventListener('click', () => {
-        handleTimeEntry('15 minutes', btn15min);
+        handleTimeEntry('15 minutes', btn15min, doc);
       });
     }
     
@@ -219,7 +258,7 @@
       dropdownMore.addEventListener('change', (e) => {
         const timeValue = e.target.value;
         if (timeValue) {
-          handleTimeEntry(timeValue, dropdownMore);
+          handleTimeEntry(timeValue, dropdownMore, doc);
           // Reset dropdown after handling
           setTimeout(() => {
             e.target.value = '';
@@ -235,20 +274,21 @@
   async function injectUI() {
     if (uiInjected) return;
     
-    const timeWorkedElement = await waitForTimeWorkedField();
-    if (!timeWorkedElement) {
+    const timeWorkedResult = await waitForTimeWorkedField();
+    if (!timeWorkedResult) {
       console.log('ServiceNow Time Assistant: Could not find Time Worked field');
       return;
     }
+    const { element: timeWorkedElement, doc } = timeWorkedResult;
     
-    ensureStyles();
+    ensureStyles(doc);
 
     // Create and inject the UI at the beginning of the form-group
     // This will make it appear to the left of the Time Worked label
-    const inlineUI = createInlineUI();
+    const inlineUI = createInlineUI(doc);
     timeWorkedElement.insertBefore(inlineUI, timeWorkedElement.firstChild);
     
-    setupEventHandlers();
+    setupEventHandlers(doc);
     uiInjected = true;
     
     console.log('ServiceNow Time Assistant: Inline UI injected successfully');
@@ -263,26 +303,33 @@
   }
 
   function pageHasMacdText() {
-    const bodyText = document.body?.innerText || '';
-    return MACD_TEXT_REGEX.test(bodyText);
+    return getDocumentContexts().some(ctx => {
+      const bodyText = ctx.body?.innerText || '';
+      return MACD_TEXT_REGEX.test(bodyText);
+    });
   }
 
   function findFieldByLabelText(labelText) {
+    const contexts = getDocumentContexts();
     const lower = labelText.toLowerCase();
-    const labels = Array.from(document.querySelectorAll('label'));
-    const label = labels.find(l => (l.textContent || '').trim().toLowerCase().includes(lower));
-    if (!label) return null;
+    for (const ctx of contexts) {
+      const labels = Array.from(ctx.querySelectorAll('label'));
+      const label = labels.find(l => (l.textContent || '').trim().toLowerCase().includes(lower));
+      if (!label) continue;
 
-    if (label.htmlFor) {
-      const direct = document.getElementById(label.htmlFor);
-      const displayField = document.getElementById(`sys_display.${label.htmlFor}`);
-      if (displayField) return displayField;
-      if (direct) return direct;
+      if (label.htmlFor) {
+        const direct = ctx.getElementById(label.htmlFor);
+        const displayField = ctx.getElementById(`sys_display.${label.htmlFor}`);
+        if (displayField) return displayField;
+        if (direct) return direct;
+      }
+
+      const container = label.closest('.form-group, tr, td, .sn-form-field') || label.parentElement;
+      if (!container) continue;
+      const field = container.querySelector('input, select, textarea');
+      if (field) return field;
     }
-
-    const container = label.closest('.form-group, tr, td, .sn-form-field') || label.parentElement;
-    if (!container) return null;
-    return container.querySelector('input, select, textarea');
+    return null;
   }
 
   function dispatchValueEvents(element) {
@@ -326,7 +373,8 @@
 
     const hiddenId = assignmentField.id?.replace('sys_display.', '');
     if (hiddenId) {
-      const hiddenField = document.getElementById(hiddenId);
+      const targetDoc = assignmentField.ownerDocument || document;
+      const hiddenField = targetDoc.getElementById(hiddenId);
       if (hiddenField) {
         hiddenField.value = '';
         dispatchValueEvents(hiddenField);
@@ -335,14 +383,17 @@
   }
 
   function removeMacdButton() {
-    const existing = document.getElementById(MACD_BUTTON_ID);
-    if (existing) {
-      existing.remove();
-    }
+    getDocumentContexts().forEach(ctx => {
+      const existing = ctx.getElementById(MACD_BUTTON_ID);
+      if (existing) {
+        existing.remove();
+      }
+    });
     macdButtonInjected = false;
   }
 
   function placeMacdButton(button, assignmentField) {
+    const doc = assignmentField.ownerDocument || document;
     const formGroup = assignmentField.closest('.form-group');
     const addons = formGroup?.querySelector('.form-field-addons');
     if (addons) {
@@ -379,14 +430,15 @@
       return;
     }
 
-    const existing = document.getElementById(MACD_BUTTON_ID);
+    const doc = assignmentField.ownerDocument || document;
+    const existing = doc.getElementById(MACD_BUTTON_ID);
     if (existing) {
       placeMacdButton(existing, assignmentField);
       macdButtonInjected = true;
       return;
     }
 
-    const button = document.createElement('button');
+    const button = doc.createElement('button');
     button.id = MACD_BUTTON_ID;
     button.type = 'button';
     button.textContent = 'MACD';
@@ -418,27 +470,35 @@
    * Initialize the extension
    */
   function init() {
+    attachFrameLoadHandler();
     // Wait for page to be ready
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', injectUI);
       document.addEventListener('DOMContentLoaded', debouncedMacdCheck);
+      document.addEventListener('DOMContentLoaded', attachFrameLoadHandler);
     } else {
       // DOM is already loaded
       injectUI();
       debouncedMacdCheck();
+      attachFrameLoadHandler();
     }
     
     // Also watch for dynamic page changes (ServiceNow is a SPA)
-    const observer = new MutationObserver((mutations) => {
+    const observer = new MutationObserver(() => {
       if (!uiInjected) {
         injectUI();
       }
       debouncedMacdCheck();
+      attachFrameLoadHandler();
     });
-    
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
+
+    getDocumentContexts().forEach(ctx => {
+      if (ctx.body) {
+        observer.observe(ctx.body, {
+          childList: true,
+          subtree: true
+        });
+      }
     });
   }
 
