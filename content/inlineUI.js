@@ -25,6 +25,7 @@
   const ASSIGNMENT_GROUP_VALUE = 'MS MACD';
   const TASK_TARGET = 'sc_task';
   const MACD_CHECK_DEBOUNCE = 300;
+  const STYLE_ID = 'sn-time-assistant-styles';
 
   let uiInjected = false;
   let macdButtonInjected = false;
@@ -82,6 +83,51 @@
       </select>
     `;
     return container;
+  }
+  /**
+   * Ensure assistant styles are available
+   */
+  function ensureStyles() {
+    if (document.getElementById(STYLE_ID)) return;
+    const style = document.createElement('style');
+    style.id = STYLE_ID;
+    style.textContent = `
+      .sn-time-assistant-container {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0 0 8px 0;
+        flex-wrap: wrap;
+      }
+      .sn-time-assistant-input {
+        min-width: 220px;
+        padding: 6px 8px;
+        border: 1px solid #d9d9d9;
+        border-radius: 4px;
+        font-size: 13px;
+      }
+      .sn-time-assistant-btn {
+        background: #005eb8;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 6px 10px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+      .sn-time-assistant-btn.loading {
+        opacity: 0.7;
+        cursor: wait;
+      }
+      .sn-time-assistant-dropdown {
+        padding: 6px 8px;
+        border: 1px solid #d9d9d9;
+        border-radius: 4px;
+        font-size: 13px;
+        min-width: 140px;
+      }
+    `;
+    document.head.appendChild(style);
   }
 
   /**
@@ -175,6 +221,8 @@
       return;
     }
     
+    ensureStyles();
+
     // Create and inject the UI at the beginning of the form-group
     // This will make it appear to the left of the Time Worked label
     const inlineUI = createInlineUI();
