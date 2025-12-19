@@ -61,6 +61,21 @@
     return waitForTimeWorkedField(retries + 1);
   }
 
+  function getRecordTarget() {
+    const topParams = new URLSearchParams(window.location.search);
+    const topTarget = topParams.get('sysparm_record_target');
+    if (topTarget) return topTarget;
+
+    const frame = document.querySelector(MAIN_IFRAME_SELECTOR);
+    const src = frame?.getAttribute('src') || frame?.contentWindow?.location?.search;
+    if (src) {
+      const qs = src.includes('?') ? src.split('?')[1] : src;
+      const params = new URLSearchParams(qs);
+      return params.get('sysparm_record_target');
+    }
+    return null;
+  }
+
   function getDocumentContexts() {
     const contexts = [document];
     const frames = Array.from(document.querySelectorAll('iframe'));
@@ -95,9 +110,19 @@
   }
 
   function findTimeWorkedElement() {
+    const target = getRecordTarget();
     const contexts = getDocumentContexts();
 
-    for (const ctx of contexts) {
+    // Prioritize incident/doc contexts first when target is incident
+    const ordered = [...contexts];
+    if (target === 'incident') {
+      const frameDoc = document.querySelector(MAIN_IFRAME_SELECTOR)?.contentDocument;
+      if (frameDoc && !ordered.includes(frameDoc)) {
+        ordered.unshift(frameDoc);
+      }
+    }
+
+    for (const ctx of ordered) {
       for (const selector of TIME_WORKED_SELECTORS) {
         const el = ctx.querySelector(selector);
         if (el) {
