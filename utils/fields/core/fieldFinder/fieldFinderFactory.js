@@ -11,20 +11,25 @@
 function createFieldFinder(fieldName, selectors) {
   return async function(doc) {
     let field = window.FieldFinder.querySelectorFirst(doc, selectors);
+
     if (!field) {
-      window.DebugLogger.log(`Waiting for ${fieldName} field...`);
+      window.FieldFinder.logDebug(`Waiting for ${fieldName} field...`);
       try {
         field = await window.FieldFinder.waitForElement(doc, selectors.join(', '));
-      } catch (e) {
-        window.DebugLogger.log(`Could not find ${fieldName} field:`, e.message);
+      } catch (error) {
+        window.FieldFinder.logWarn(`Could not find ${fieldName} field:`, error.message);
+        window.FieldFinder.captureException(error, {
+          fieldName,
+          selectors
+        });
         return null;
       }
     }
-    window.DebugLogger.log(`Found ${fieldName}:`, field?.id);
+
+    window.FieldFinder.logDebug(`Found ${fieldName}:`, field?.id);
     return field;
   };
 }
 
 window.FieldFinder = window.FieldFinder || {};
 window.FieldFinder.createFieldFinder = createFieldFinder;
-

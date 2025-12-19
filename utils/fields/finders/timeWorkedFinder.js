@@ -4,33 +4,69 @@
  * @returns {Promise<{container: HTMLElement, hourInput: HTMLElement, minInput: HTMLElement, secInput: HTMLElement, hiddenTime: HTMLElement}>}
  */
 window.FieldFinder.findTimeWorkedFields = async function(doc) {
-  let timeContainer = doc.querySelector('[id*="time_worked"]');
-  if (!timeContainer) {
-    console.log('time_worked not immediately found, waiting...');
-    timeContainer = await window.FieldFinder.waitForElement(doc, 'input[id*="time_worked"], div[id*="time_worked"]');
-  }
-  console.log('Found time container:', timeContainer.id);
+  try {
+    const timeContainer = await findTimeWorkedContainer(doc);
+    const { hourInput, minInput, secInput } = extractTimeInputs(timeContainer);
+    const hiddenTime = findHiddenTimeField(doc);
 
-  // Find parent div if we got an input
-  if (timeContainer.tagName === 'INPUT') {
-    timeContainer = timeContainer.closest('div[id*="time_worked"]') || timeContainer.parentElement;
+    return { container: timeContainer, hourInput, minInput, secInput, hiddenTime };
+  } catch (error) {
+    window.FieldFinder.captureException(error, { finder: 'time_worked' });
+    throw error;
+  }
+};
+
+async function findTimeWorkedContainer(doc) {
+  const immediate = doc.querySelector('[id*="time_worked"]');
+  if (immediate) {
+    const normalized = normalizeTimeContainer(immediate);
+    window.FieldFinder.logDebug('Found time container immediately:', normalized?.id);
+    return normalized;
   }
 
+  window.FieldFinder.logDebug('time_worked not immediately found, waiting...');
+  const awaited = await window.FieldFinder.waitForElement(
+    doc,
+    'input[id*="time_worked"], div[id*="time_worked"]'
+  );
+  const normalized = normalizeTimeContainer(awaited);
+  window.FieldFinder.logDebug('Found time container after wait:', normalized?.id);
+  return normalized;
+}
+
+function normalizeTimeContainer(container) {
+  if (!container) {
+    throw new Error('time_worked container not found');
+  }
+
+  if (container.tagName === 'INPUT') {
+    return container.closest('div[id*="time_worked"]') || container.parentElement || container;
+  }
+
+  return container;
+}
+
+function extractTimeInputs(timeContainer) {
   const timeInputs = timeContainer.querySelectorAll('input.form-control');
-  console.log('Found time inputs:', timeInputs.length);
+  window.FieldFinder.logDebug('Found time inputs:', timeInputs.length);
+
   if (timeInputs.length < 3) {
     throw new Error(`Expected 3 time inputs, found ${timeInputs.length}`);
   }
-  const hourInput = timeInputs[0];
-  const minInput = timeInputs[1];
-  const secInput = timeInputs[2];
 
-  // Find hidden time field
-  const hiddenTime = doc.querySelector('[id$="time_worked"]') ||
-                    doc.querySelector('input[name*="time_worked"]');
-  if (!hiddenTime) throw new Error('Hidden time field not found');
-  console.log('Found hidden time:', hiddenTime.id);
+  const [hourInput, minInput, secInput] = timeInputs;
+  return { hourInput, minInput, secInput };
+}
 
-  return { container: timeContainer, hourInput, minInput, secInput, hiddenTime };
-};
+function findHiddenTimeField(doc) {
+  const hiddenTime =
+    doc.querySelector('[id$="time_worked"]') ||
+    doc.querySelector('input[name*="time_worked"]');
 
+  if (!hiddenTime) {
+    throw new Error('Hidden time field not found');
+  }
+
+  window.FieldFinder.logDebug('Found hidden time:', hiddenTime.id);
+  return hiddenTime;
+}
