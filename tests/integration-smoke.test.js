@@ -23,7 +23,7 @@ describe('Regression Prevention Tests', () => {
   let setupHandlersCode;
   beforeAll(() => { setupHandlersCode = fs.readFileSync(path.join(__dirname, '../popup/scripts/buttonHandlers/setupHandlers.js'), 'utf8'); });
   test('CRITICAL: setupButtonHandlers function must exist', () => { expect(setupHandlersCode).toContain('function setupButtonHandlers()'); });
-  test('CRITICAL: setupButtonHandlers must register all button types', () => { expect(setupHandlersCode).toContain(\"querySelectorAll('.time-save-btn')\"); expect(setupHandlersCode).toContain(\"querySelectorAll('.alert-cleared-btn')\"); });
+  test('CRITICAL: setupButtonHandlers must register all button types', () => { expect(setupHandlersCode).toContain("querySelectorAll('.time-save-btn')"); expect(setupHandlersCode).toContain("querySelectorAll('.alert-cleared-btn')"); });
   test('CRITICAL: all individual setup functions must exist', () => { ['setupTimeSaveButtonHandler', 'setupAlertClearedButtonHandler'].forEach(funcName => { expect(setupHandlersCode).toContain(`function ${funcName}(`); }); });
 });
 describe('Reference Field Fix Verification', () => {
