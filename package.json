@@ -18,7 +18,6 @@
       "**/tests/**/*.test.js"
     ],
     "collectCoverageFrom": [
-      "popup/scripts/**/*.js",
       "content/**/*.js",
       "core/**/*.js",
       "utils/**/*.js",

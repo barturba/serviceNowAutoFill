@@ -33,9 +33,8 @@ When adding new functionality, please add corresponding tests:
 ## Regression Prevention
 
 The test suite includes critical regression tests to catch issues like:
-- Missing function definitions that break all buttons
+- Missing function definitions that break inline buttons
 - Reference field assignment failures
-- Missing DOM elements in popup
 
 Run tests before every commit to prevent breaking changes.
 

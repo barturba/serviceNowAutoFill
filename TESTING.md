@@ -61,12 +61,10 @@ Before each release, manually verify:
 
 The test suite includes specific regression tests for:
 
-1. **Button Handler Registration** - Ensures `setupButtonHandlers()` function exists and is called
-2. **Reference Field Assignment** - Ensures display fields are properly set for autocomplete
-3. **DOM Element Presence** - Verifies all expected buttons exist in popup
+1. **Reference Field Assignment** - Ensures display fields are properly set for autocomplete
+2. **MACD Assignment Steps** - Ensures processors set state/category/subcategory/assignment correctly
 
 These tests prevent critical bugs like:
-- Commit 8ad02ee bug where refactoring removed `setupButtonHandlers()` breaking all buttons
 - MACD assignment failures due to improper reference field handling
 
 ## Test Coverage Goals

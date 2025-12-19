@@ -68,7 +68,6 @@ fi
 
 zip -r "$BUILD_DIR/$ZIP_NAME" \
   manifest.json \
-  popup/ \
   content/ \
   core/ \
   utils/ \
