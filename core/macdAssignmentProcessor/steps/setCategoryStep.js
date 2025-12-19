@@ -21,3 +21,5 @@ async function setCategoryStep(doc, fieldsToUpdate, errors) {
   }
 }
 
+
+

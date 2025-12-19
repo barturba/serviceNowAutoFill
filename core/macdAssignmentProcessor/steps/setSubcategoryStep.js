@@ -31,3 +31,5 @@ async function setSubcategoryStep(doc, fieldsToUpdate, errors) {
   }
 }
 
+
+
