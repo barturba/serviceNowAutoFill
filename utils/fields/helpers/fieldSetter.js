@@ -75,13 +75,7 @@ function logError(...args) {
 }
 
 function captureException(error, context = {}) {
-  try {
-    if (window.Sentry && typeof window.Sentry.captureException === 'function') {
-      window.Sentry.captureException(error, { extra: context });
-    }
-  } catch (_) {
-    // best-effort capture
-  }
+  // Log errors without relying on external trackers
   logError('Field setter error', context, error);
 }
 

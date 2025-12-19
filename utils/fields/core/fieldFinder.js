@@ -1,6 +1,6 @@
 /**
  * Field finding utilities for ServiceNow forms
- * Provides shared logging and error capture helpers.
+ * Provides shared logging and error helpers.
  */
 
 window.FieldFinder = window.FieldFinder || {};
@@ -37,13 +37,7 @@ function logError(...args) {
 }
 
 function captureException(error, context = {}) {
-  try {
-    if (window.Sentry && typeof window.Sentry.captureException === 'function') {
-      window.Sentry.captureException(error, { extra: context });
-    }
-  } catch (_) {
-    // Sentry capture should never break execution
-  }
+  // Keep logging but avoid relying on external trackers
   logError('FieldFinder error', context, error);
 }
 
