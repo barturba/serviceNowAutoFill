@@ -2,6 +2,22 @@
  * Field setting helpers with g_form fallbacks
  */
 
+const getFieldFinderLogger = () => window.FieldFinder || {};
+const logWarn = (...args) => {
+  const ff = getFieldFinderLogger();
+  return typeof ff.logWarn === 'function' ? ff.logWarn(...args) : console.warn(...args);
+};
+const logError = (...args) => {
+  const ff = getFieldFinderLogger();
+  return typeof ff.logError === 'function' ? ff.logError(...args) : console.error(...args);
+};
+const captureException = (error, context = {}) => {
+  const ff = getFieldFinderLogger();
+  return typeof ff.captureException === 'function'
+    ? ff.captureException(error, context)
+    : logError('Field setter error', context, error);
+};
+
 function setFieldValue(doc, field, fieldName, value) {
   if (!field) {
     logWarn(`Field "${fieldName}" not provided, skipping setFieldValue`);
@@ -57,28 +73,6 @@ function normalizeFields(fields) {
   if (fields instanceof NodeList) return Array.from(fields);
   return [fields];
 }
-
-function logWarn(...args) {
-  if (window.DebugLogger && typeof window.DebugLogger.warn === 'function') {
-    window.DebugLogger.warn(...args);
-  } else {
-    console.warn(...args);
-  }
-}
-
-function logError(...args) {
-  if (window.DebugLogger && typeof window.DebugLogger.error === 'function') {
-    window.DebugLogger.error(...args);
-  } else {
-    console.error(...args);
-  }
-}
-
-function captureException(error, context = {}) {
-  // Log errors without relying on external trackers
-  logError('Field setter error', context, error);
-}
-
 window.setFieldValue = setFieldValue;
 window.setSelectFieldValue = setSelectFieldValue;
 window.dispatchFieldEvents = dispatchFieldEvents;
