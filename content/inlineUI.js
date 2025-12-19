@@ -19,7 +19,16 @@
     { value: '2 hours', label: '2 hours' }
   ];
 
+  const MACD_BUTTON_ID = 'sn-macd-assignment-btn';
+  const MACD_TEXT_REGEX = /\bMACD\b/i;
+  const STATE_ASSIGNED_TEXT = 'Assigned';
+  const ASSIGNMENT_GROUP_VALUE = 'MS MACD';
+  const TASK_TARGET = 'sc_task';
+  const MACD_CHECK_DEBOUNCE = 300;
+
   let uiInjected = false;
+  let macdButtonInjected = false;
+  let macdCheckTimer = null;
 
   /**
    * Wait for the Time Worked field to be available
@@ -178,15 +187,159 @@
   }
 
   /**
+   * Helpers for MACD button
+   */
+  function isTaskPage() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('sysparm_record_target') === TASK_TARGET;
+  }
+
+  function pageHasMacdText() {
+    const bodyText = document.body?.innerText || '';
+    return MACD_TEXT_REGEX.test(bodyText);
+  }
+
+  function findFieldByLabelText(labelText) {
+    const lower = labelText.toLowerCase();
+    const labels = Array.from(document.querySelectorAll('label'));
+    const label = labels.find(l => (l.textContent || '').trim().toLowerCase().includes(lower));
+    if (!label) return null;
+
+    if (label.htmlFor) {
+      const direct = document.getElementById(label.htmlFor);
+      const displayField = document.getElementById(`sys_display.${label.htmlFor}`);
+      if (displayField) return displayField;
+      if (direct) return direct;
+    }
+
+    const container = label.closest('.form-group, tr, td, .sn-form-field') || label.parentElement;
+    if (!container) return null;
+    return container.querySelector('input, select, textarea');
+  }
+
+  function dispatchValueEvents(element) {
+    ['input', 'change', 'blur'].forEach(type => {
+      element.dispatchEvent(new Event(type, { bubbles: true }));
+    });
+  }
+
+  function setStateAssigned() {
+    const stateField = findFieldByLabelText('State');
+    if (!stateField) {
+      console.warn('MACD helper: State field not found');
+      return;
+    }
+
+    if (stateField.tagName === 'SELECT') {
+      const options = Array.from(stateField.options);
+      const targetOption = options.find(opt => (opt.textContent || '').trim().toLowerCase() === STATE_ASSIGNED_TEXT.toLowerCase());
+      if (targetOption) {
+        stateField.value = targetOption.value;
+      } else {
+        // fallback to setting display text directly
+        stateField.value = STATE_ASSIGNED_TEXT;
+      }
+    } else {
+      stateField.value = STATE_ASSIGNED_TEXT;
+    }
+
+    dispatchValueEvents(stateField);
+  }
+
+  function setAssignmentGroup() {
+    const assignmentField = findFieldByLabelText('Assignment group');
+    if (!assignmentField) {
+      console.warn('MACD helper: Assignment Group field not found');
+      return;
+    }
+
+    assignmentField.value = ASSIGNMENT_GROUP_VALUE;
+    dispatchValueEvents(assignmentField);
+
+    const hiddenId = assignmentField.id?.replace('sys_display.', '');
+    if (hiddenId) {
+      const hiddenField = document.getElementById(hiddenId);
+      if (hiddenField) {
+        hiddenField.value = '';
+        dispatchValueEvents(hiddenField);
+      }
+    }
+  }
+
+  function removeMacdButton() {
+    const existing = document.getElementById(MACD_BUTTON_ID);
+    if (existing) {
+      existing.remove();
+    }
+    macdButtonInjected = false;
+  }
+
+  function handleMacdClick() {
+    try {
+      setStateAssigned();
+      setAssignmentGroup();
+    } catch (error) {
+      console.error('MACD helper error:', error);
+    }
+  }
+
+  function ensureMacdButton() {
+    if (!isTaskPage() || !pageHasMacdText()) {
+      removeMacdButton();
+      return;
+    }
+
+    const assignmentField = findFieldByLabelText('Assignment group');
+    if (!assignmentField) {
+      return;
+    }
+
+    const existing = document.getElementById(MACD_BUTTON_ID);
+    if (existing) {
+      macdButtonInjected = true;
+      return;
+    }
+
+    const button = document.createElement('button');
+    button.id = MACD_BUTTON_ID;
+    button.type = 'button';
+    button.textContent = 'MACD';
+    button.style.marginLeft = '8px';
+    button.style.padding = '4px 8px';
+    button.style.background = '#005eb8';
+    button.style.color = '#fff';
+    button.style.border = 'none';
+    button.style.borderRadius = '4px';
+    button.style.cursor = 'pointer';
+
+    button.addEventListener('click', handleMacdClick);
+
+    assignmentField.insertAdjacentElement('afterend', button);
+    macdButtonInjected = true;
+  }
+
+  function debouncedMacdCheck() {
+    if (macdCheckTimer) {
+      clearTimeout(macdCheckTimer);
+    }
+    macdCheckTimer = setTimeout(() => {
+      macdCheckTimer = null;
+      ensureMacdButton();
+    }, MACD_CHECK_DEBOUNCE);
+  }
+
+  /**
    * Initialize the extension
    */
   function init() {
     // Wait for page to be ready
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', injectUI);
+      document.addEventListener('DOMContentLoaded', debouncedMacdCheck);
     } else {
       // DOM is already loaded
       injectUI();
+      debouncedMacdCheck();
     }
     
     // Also watch for dynamic page changes (ServiceNow is a SPA)
@@ -194,6 +347,7 @@
       if (!uiInjected) {
         injectUI();
       }
+      debouncedMacdCheck();
     });
     
     observer.observe(document.body, {
