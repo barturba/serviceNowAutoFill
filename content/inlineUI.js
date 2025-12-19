@@ -37,7 +37,6 @@
   const MACD_CHECK_DEBOUNCE = 300;
   const STYLE_ID = 'sn-time-assistant-styles';
   const MAIN_IFRAME_SELECTOR = '#gsft_main, iframe#gsft_main, iframe[name="gsft_main"]';
-
   let injectedDocs = new WeakSet();
   let macdButtonInjected = false;
   let macdCheckTimer = null;
@@ -190,24 +189,27 @@
         display: flex;
         align-items: center;
         gap: 8px;
-        margin: 0 0 8px 0;
+        margin: 6px 0 10px 0;
         flex-wrap: wrap;
       }
       .sn-time-assistant-input {
-        min-width: 220px;
+        min-width: 240px;
         padding: 6px 8px;
-        border: 1px solid #d9d9d9;
+        border: 1px solid #c7d0d9;
         border-radius: 4px;
         font-size: 13px;
+        line-height: 18px;
+        box-shadow: none;
       }
       .sn-time-assistant-btn {
         background: #005eb8;
         color: #fff;
         border: none;
         border-radius: 4px;
-        padding: 6px 10px;
+        padding: 6px 12px;
         cursor: pointer;
         font-weight: 600;
+        font-size: 13px;
       }
       .sn-time-assistant-btn.loading {
         opacity: 0.7;
@@ -215,10 +217,12 @@
       }
       .sn-time-assistant-dropdown {
         padding: 6px 8px;
-        border: 1px solid #d9d9d9;
+        border: 1px solid #c7d0d9;
         border-radius: 4px;
         font-size: 13px;
-        min-width: 140px;
+        min-width: 150px;
+        background: #fff;
+        box-shadow: none;
       }
     `;
     (targetDoc.head || document.head).appendChild(style);
