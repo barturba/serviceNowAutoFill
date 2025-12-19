@@ -38,7 +38,7 @@
   const STYLE_ID = 'sn-time-assistant-styles';
   const MAIN_IFRAME_SELECTOR = '#gsft_main, iframe#gsft_main, iframe[name="gsft_main"]';
 
-  let uiInjected = false;
+  let injectedDocs = new WeakSet();
   let macdButtonInjected = false;
   let macdCheckTimer = null;
   let trackedFrame = null;
@@ -63,9 +63,19 @@
 
   function getDocumentContexts() {
     const contexts = [document];
-    const iframe = document.querySelector(MAIN_IFRAME_SELECTOR);
-    if (iframe && iframe.contentDocument) {
-      contexts.push(iframe.contentDocument);
+    const frames = Array.from(document.querySelectorAll('iframe'));
+    frames.forEach(frame => {
+      try {
+        if (frame.contentDocument) {
+          contexts.push(frame.contentDocument);
+        }
+      } catch (e) {
+        // cross-origin; skip
+      }
+    });
+    const mainFrame = document.querySelector(MAIN_IFRAME_SELECTOR);
+    if (mainFrame && mainFrame.contentDocument && !contexts.includes(mainFrame.contentDocument)) {
+      contexts.push(mainFrame.contentDocument);
     }
     return contexts;
   }
@@ -75,7 +85,7 @@
     if (!frame || frame === trackedFrame) return;
     trackedFrame = frame;
     frame.addEventListener('load', () => {
-      uiInjected = false;
+      injectedDocs = new WeakSet();
       debouncedMacdCheck();
       // Give the frame a brief moment to render before searching
       setTimeout(() => {
@@ -271,15 +281,20 @@
   /**
    * Inject the UI into the page
    */
+  function isUiPresent(doc) {
+    return !!doc.getElementById('sn-time-assistant-comments');
+  }
+
   async function injectUI() {
-    if (uiInjected) return;
-    
     const timeWorkedResult = await waitForTimeWorkedField();
     if (!timeWorkedResult) {
       console.log('ServiceNow Time Assistant: Could not find Time Worked field');
       return;
     }
     const { element: timeWorkedElement, doc } = timeWorkedResult;
+    if (injectedDocs.has(doc) || isUiPresent(doc)) {
+      return;
+    }
     
     ensureStyles(doc);
 
@@ -289,7 +304,7 @@
     timeWorkedElement.insertBefore(inlineUI, timeWorkedElement.firstChild);
     
     setupEventHandlers(doc);
-    uiInjected = true;
+    injectedDocs.add(doc);
     
     console.log('ServiceNow Time Assistant: Inline UI injected successfully');
   }
@@ -393,7 +408,6 @@
   }
 
   function placeMacdButton(button, assignmentField) {
-    const doc = assignmentField.ownerDocument || document;
     const formGroup = assignmentField.closest('.form-group');
     const addons = formGroup?.querySelector('.form-field-addons');
     if (addons) {
@@ -485,9 +499,7 @@
     
     // Also watch for dynamic page changes (ServiceNow is a SPA)
     const observer = new MutationObserver(() => {
-      if (!uiInjected) {
-        injectUI();
-      }
+      injectUI();
       debouncedMacdCheck();
       attachFrameLoadHandler();
     });
