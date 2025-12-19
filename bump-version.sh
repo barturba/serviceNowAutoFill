@@ -71,8 +71,31 @@ echo ""
 # Update manifest.json
 sed -i.bak "s/\"version\": \"$CURRENT_VERSION\"/\"version\": \"$NEW_VERSION\"/" manifest.json
 rm manifest.json.bak
-
 echo "✓ Updated manifest.json"
+
+# Update package.json and package-lock.json to keep versions aligned
+NODE_SCRIPT=$(cat <<'NODE'
+const fs = require('fs');
+const version = process.env.NEW_VERSION;
+
+function updateJson(path, updater) {
+  const data = JSON.parse(fs.readFileSync(path, 'utf8'));
+  updater(data);
+  fs.writeFileSync(path, JSON.stringify(data, null, 2) + '\n');
+  console.log(`✓ Updated ${path}`);
+}
+
+updateJson('package.json', (pkg) => { pkg.version = version; });
+
+updateJson('package-lock.json', (lock) => {
+  lock.version = version;
+  if (lock.packages && lock.packages[""]) {
+    lock.packages[""].version = version;
+  }
+});
+NODE
+)
+NEW_VERSION="$NEW_VERSION" node -e "$NODE_SCRIPT"
 
 # Build the extension
 echo ""
@@ -81,7 +104,7 @@ echo ""
 # Git operations
 echo ""
 echo "Creating git commit and tag..."
-git add manifest.json
+git add manifest.json package.json package-lock.json
 git commit -m "Bump version to $NEW_VERSION"
 git tag -a "v$NEW_VERSION" -m "Version $NEW_VERSION"
 

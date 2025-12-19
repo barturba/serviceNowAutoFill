@@ -31,12 +31,3 @@ function validateFormProcessing() {
   validateIframeFinder();
 }
 
-/**
- * Validate MACD assignment dependencies
- */
-function validateMacdAssignment() {
-  validateFormFiller('processMacdAssignment');
-  validateIframeFinder();
-}
-
-
