@@ -4,7 +4,7 @@
  * @returns {Promise<{field: HTMLElement|null, editable: HTMLElement|null}>} Object with field and editable element
  */
 window.FieldFinder.findWorkNotesField = async function(doc) {
-  let workNotesField = window.FieldFinder.querySelectorFirst(doc, [
+  const fieldSelectors = [
     'textarea#activity-stream-textarea',
     'textarea[data-stream-text-input="work_notes"]',
     'textarea[ng-model*="inputTypeValue"]',
@@ -15,26 +15,49 @@ window.FieldFinder.findWorkNotesField = async function(doc) {
     'input[id$=".work_notes"]',
     'textarea[id*="work_notes"]',
     'input[id*="work_notes"]'
-  ]);
-  if (!workNotesField) {
-    console.log('Waiting for work_notes field...');
-    try {
-      workNotesField = await window.FieldFinder.waitForElement(doc, 'textarea#activity-stream-textarea, textarea[data-stream-text-input="work_notes"], textarea[id$=".work_notes"], textarea[id*="work_notes"], input[id*="work_notes"]');
-    } catch (e) {
-      console.log('Could not find work_notes field:', e.message);
-    }
-  }
-  console.log('Found work_notes:', workNotesField?.id, 'tag:', workNotesField?.tagName, 'has ng-model:', workNotesField?.getAttribute('ng-model'));
-
-  // Also look for contenteditable rich text editor for work_notes
-  let workNotesEditable = window.FieldFinder.querySelectorFirst(doc, [
+  ];
+  const editableSelectors = [
     '[id*="work_notes"][contenteditable="true"]',
     '[contenteditable="true"][id*="work_notes"]'
-  ]);
-  if (workNotesEditable) {
-    console.log('Found work_notes contenteditable element:', workNotesEditable.id || workNotesEditable.className);
-  }
+  ];
 
-  return { field: workNotesField, editable: workNotesEditable };
+  try {
+    let workNotesField = window.FieldFinder.querySelectorFirst(doc, fieldSelectors);
+
+    if (!workNotesField) {
+      window.FieldFinder.logDebug('Waiting for work_notes field...');
+      try {
+        workNotesField = await window.FieldFinder.waitForElement(doc, fieldSelectors.join(', '));
+      } catch (error) {
+        window.FieldFinder.logWarn('Could not find work_notes field:', error.message);
+        window.FieldFinder.captureException(error, {
+          finder: 'work_notes',
+          selectors: fieldSelectors
+        });
+      }
+    }
+
+    window.FieldFinder.logDebug(
+      'Found work_notes candidate:',
+      workNotesField?.id,
+      'tag:',
+      workNotesField?.tagName,
+      'has ng-model:',
+      workNotesField?.getAttribute?.('ng-model')
+    );
+
+    const workNotesEditable = window.FieldFinder.querySelectorFirst(doc, editableSelectors);
+    if (workNotesEditable) {
+      window.FieldFinder.logDebug(
+        'Found work_notes contenteditable element:',
+        workNotesEditable.id || workNotesEditable.className
+      );
+    }
+
+    return { field: workNotesField || null, editable: workNotesEditable || null };
+  } catch (error) {
+    window.FieldFinder.captureException(error, { finder: 'work_notes' });
+    return { field: null, editable: null };
+  }
 };
 
