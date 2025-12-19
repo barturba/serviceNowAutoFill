@@ -7,7 +7,11 @@
   'use strict';
 
   // Configuration
-  const TIME_WORKED_SELECTOR = '#element\\.incident\\.time_worked';
+  const TIME_WORKED_SELECTORS = [
+    '#element\\.incident\\.time_worked',
+    '#element\\.sc_task\\.time_worked',
+    '[id^="element."][id$=".time_worked"]'
+  ];
   const RETRY_DELAY = 500;
   const MAX_RETRIES = 20;
   
@@ -35,18 +39,34 @@
    * Wait for the Time Worked field to be available
    */
   async function waitForTimeWorkedField(retries = 0) {
-    const element = document.querySelector(TIME_WORKED_SELECTOR);
+    const element = findTimeWorkedElement();
     if (element) {
       return element;
     }
-    
+
     if (retries >= MAX_RETRIES) {
       console.log('ServiceNow Time Assistant: Time Worked field not found after max retries');
       return null;
     }
-    
+
     await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
     return waitForTimeWorkedField(retries + 1);
+  }
+
+  function findTimeWorkedElement() {
+    for (const selector of TIME_WORKED_SELECTORS) {
+      const el = document.querySelector(selector);
+      if (el) return el;
+    }
+
+    // fallback: locate by label text
+    const labels = Array.from(document.querySelectorAll('label'));
+    const label = labels.find(l => (l.textContent || '').trim().toLowerCase().includes('time worked'));
+    if (label) {
+      return label.closest('.form-group') || label.parentElement;
+    }
+
+    return null;
   }
 
   /**
