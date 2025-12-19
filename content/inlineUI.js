@@ -274,6 +274,23 @@
     macdButtonInjected = false;
   }
 
+  function placeMacdButton(button, assignmentField) {
+    const formGroup = assignmentField.closest('.form-group');
+    const addons = formGroup?.querySelector('.form-field-addons');
+    if (addons) {
+      addons.appendChild(button);
+      return;
+    }
+
+    const container = assignmentField.closest('.ref-container, .input-group, .sn-form-field, td') || assignmentField.parentElement;
+    if (container) {
+      container.appendChild(button);
+      return;
+    }
+
+    assignmentField.insertAdjacentElement('afterend', button);
+  }
+
   function handleMacdClick() {
     try {
       setStateAssigned();
@@ -296,6 +313,7 @@
 
     const existing = document.getElementById(MACD_BUTTON_ID);
     if (existing) {
+      placeMacdButton(existing, assignmentField);
       macdButtonInjected = true;
       return;
     }
@@ -314,7 +332,7 @@
 
     button.addEventListener('click', handleMacdClick);
 
-    assignmentField.insertAdjacentElement('afterend', button);
+    placeMacdButton(button, assignmentField);
     macdButtonInjected = true;
   }
 
